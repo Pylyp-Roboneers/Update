@@ -14,6 +14,7 @@ echo "     " CPU $(sudo dmidecode -t system | grep Serial)
 
 # SERVER PING AND ARCHIVE COPY
 if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or --ping
+
   echo  -e "\n\n  CHECK connection to Server by ping"
   ping 77.222.152.213 -c2
   if [ $? -eq 0 ]; then 
@@ -39,7 +40,14 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or -
       echo -e "Fault of copy from Server. \nExit"
       exit 1 
     fi
-  else echo -e "==No copy process: Archive file on Server is same to archive file on local"
+  else 
+    echo -e "==No copy process: Archive file on Server is same to archive file on local"
+    if [ "$1" == "--ping" ]; then 
+      if [ -d "$CWD/UpDate" ] 
+        then echo -e "==Folder $CWD/UpDate exists.\nExit";  exit 0
+        else echo -e "==Folder $CWD/UpDate does not exist. No need to update. \nExit."; exit 1
+      fi
+    fi
   fi
 
   echo -e "\n\n  EXPRACTING from $CWD/update.7z"
@@ -62,107 +70,111 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or -
   if [ "$1" == "--ping" ]; then exit 0; fi;
 fi # END of SERVER PING AND ARCHIVE COPY ## if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]
 
+# REPLACE UPDATE SOFTWARE FILES AND BACKUP PREVIOUS FILE
 if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
+
+  echo -e "\n\n  CHECK folder with update software files"
   if [ -d "$CWD/UpDate" ]; then 
-    echo -e "\e[1;32m   $CWD/UpDate/ exists\e[0m"
+    echo -e "==$CWD/UpDate/ exists."
   else
-    echo -e "\e[1;31m   $CWD/UpDate/ dose not exist. \nExit\e[0m"
+    echo -e "    $CWD/UpDate/ dose not exist. \nExit"
     exit 1
   fi
   sudo -n chmod 777 -R $CWD/UpDate
 
-  echo -e "\e[1;33m  5 Delete content of previous $CWD/BackUp\e[0m"
+  echo -e "\n\n  DELETE content of previous $CWD/BackUp"
   rm -r -f $CWD/BackUp
   mkdir $CWD/BackUp
   sudo -n chmod 777 -R $CWD/BackUp
 
-  echo -e "\e[1;33m  6 Stat of previous soft files for BackUp  \e[0m"
-  echo -e "\e[1;33m---Date of previous files\e[0m"
-  echo modified : created : name : size
+  echo -e "\n\n  DETAILS of previous software files for BackUp"
+  echo modified : created : name : size  / SHA1
   for aFile in ${!filePathList[@]}; do
       stat -c '<<< %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
+      echo -e "        $(sha1sum ${filePathList[$aFile]}$aFile  | cut -d " " -f 1)"
   done
 
-  echo -e "\e[1;33m---Copy BackUp files\e[0m"
+  echo -e "\n\n  COPY BackUp files"
   for aFile in ${!filePathList[@]}; do
     sudo -n cp ${filePathList[$aFile]}$aFile  $CWD/BackUp/
   done
-
-  ## Check backup files existence
-  for aFile in ${!filePathList[@]}; do
+  for aFile in ${!filePathList[@]}; do  # Check backup files existence
     if [ ! -f "$CWD/BackUp/$aFile" ]; then 
-      echo -e "\e[1;31m  Backup of $aFile dose not exist. \nExit\e[0m"; exit 1
+      echo -e "    Backup of $aFile dose not exist. \nExit"; exit 1
     fi
   done
-  echo -e "\e[1;32m==BackUp complited\e[0m"
+  echo -e "==BackUp complited"
 
-  echo -e "\e[1;33m  7 Stoping correspondent processes\e[0m"
+  echo -e "  STOP correspondent processes"
   for aFile in ${!filePathList[@]}; do
     pkill -f "$aFile"
   done
-  # pkill -f "GUI_1_0"
-  # pkill -f "autopilot_control"
+  sleep 3  # wait to processes are completely stop
 
-  echo -e "\e[1;33m  8 Replace UpDate files\e[0m"
+  echo -e "\n\n  REPLACE software UpDate files"
   for aFile in ${!filePathList[@]}; do
     sudo cp $CWD/UpDate/$aFile ${filePathList[$aFile]}$aFile
     if [ $? -ne 0 ]; 
-      then echo -e "\e[1;31m replace of ${filePathList[$aFile]}$aFile is fault.\e[0m"; 
+      then echo -e "    replace of ${filePathList[$aFile]}$aFile is fault."; 
       else echo ====${filePathList[$aFile]}$aFile is copied
     fi
   done
 
-  echo -e "\e[1;33m---Date of current files\e[0m"
-  echo modified : created : name : size
+  echo -e "\n\n  DETAILS of current software files for BackUp"
+  echo modified : created : name : size  / SHA1
   for aFile in ${!filePathList[@]}; do
-      stat -c '<<< %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
+      stat -c '>>> %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
+      echo -e "        $(sha1sum ${filePathList[$aFile]}$aFile  | cut -d " " -f 1)"
   done
 
+  echo -e "\n\n  DELETE folder with extracted files $CWD/UpDate"
+  rm -r -f $CWD/UpDate
+
   unset filePathList
-  echo -e "\n\e[1;33m END of Update  \n\e[0m"
-  sleep 10
+  echo -e "UPDATE IS COMPLITEd"
   exit 0
-fi # END of MAIN PROCEDURE of UPDATE # if [[ "$#" -eq 0 ]];
+fi # END of REPLACE UPDATE FILES AND BACKUP FILE # if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
 
 if [ "$1" == "--backup" ]; then  ## BACKUP PROCEDURE
-  echo -e "\e[1;33m PROCEDURE of COPY BACK previously saved backup files from $CWD/UpDate \e[0m"
-  echo CPU $(sudo dmidecode -t system | grep Serial)
+  echo -e "  PROCEDURE of COPY BACK previously saved backup files from $CWD/UpDate"
   # Check existance of BackUp folder
-  if [ -d "$CWD/UpDate" ]; then 
-    echo -e "\e[1;32m   $CWD/UpDate/ exists\e[0m"
+  if [ -d "$CWD/BackUp" ]; then 
+    echo -e "    $CWD/BackUp/ exists\e[0m"
   else
-    echo -e "\e[1;31m   $CWD/UpDate/ dose not exist.\nFault BackUp \nExit\e[0m"
+    echo -e "    $CWD/BackUp/ dose not exist.\nFault BackUp \nExit"
     exit 1
   fi
 
-  echo -e "\e[1;33m Stoping correspondent processes\e[0m"
+  echo -e "  STOP correspondent processes"
   for aFile in ${!filePathList[@]}; do
     pkill -f "$aFile"
   done
-  sleep 3
+  sleep 3  # wait to processes are completely stop
 
-  echo -e "\e[1;33m---Date of previous files\e[0m"
-  echo modified : created : name : size
+  echo -e "\n\n  DETAILS of previous software files for BackUp"
+  echo modified : created : name : size  / SHA1
   for aFile in ${!filePathList[@]}; do
       stat -c '<<< %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
+      echo -e "        $(sha1sum ${filePathList[$aFile]}$aFile  | cut -d " " -f 1)"
   done
 
-  echo -e "\e[1;33m---Copy BackUp files from $CWD/BackUp/ to program folders\e[0m"
+  echo -e "  COPY BackUp files from $CWD/BackUp/ to program folders\e[0m"
   for aFile in ${!filePathList[@]}; do
     sudo cp $CWD/BackUp/$aFile ${filePathList[$aFile]}
     if [ $? -ne 0 ]; 
       then echo -e "\e[1;31m Copy to ${filePathList[$aFile]}$aFile is fault.\e[0m"; 
-      else echo "   ${filePathList[$aFile]}$aFile is copied"
+      else echo "==${filePathList[$aFile]}$aFile is copied"
     fi
   done
 
-  echo -e "\e[1;33m---Date of current files\e[0m"
-  echo modified : created : name : size
+  echo -e "\n\n  DETAILS of current software files for BackUp"
+  echo modified : created : name : size  / SHA1
   for aFile in ${!filePathList[@]}; do
-      stat -c '<<< %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
+      stat -c '>>> %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
+      echo -e "        $(sha1sum ${filePathList[$aFile]}$aFile  | cut -d " " -f 1)"
   done
-  echo Backup procedure finished
-  sleep 10
+  echo "==Backup procedure finished"
+  unset filePathList
   exit 0
 fi  ## END OF BACKUP PROCEDURE
 

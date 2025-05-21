@@ -18,6 +18,7 @@ public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
     QTimer LaterTimer;
+    int Mode = 0;
 
 private slots:
     void on_pushButton_clicked();

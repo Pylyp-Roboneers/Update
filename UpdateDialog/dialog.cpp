@@ -19,7 +19,7 @@ Dialog::~Dialog()
 void Dialog::on_pushButton_clicked()
 {
     system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh | tee $LogFileName;\""
+        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --replace | tee $LogFileName;\""
         " sleep 3; konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
         // " sleep 3; konsole -e $SHELL -c \"cp $LogFileName /home/deck/Downloads/1\"");
 
