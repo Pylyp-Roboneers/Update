@@ -9,58 +9,60 @@ filePathList["autopilot_control"]="/usr/bin/"
 filePathList["gamepad_udp_run"]="/usr/bin/"
 filePathList["GUI_1_0"]="/usr/bin/"
 
-if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # there is no argument
-# MAIN PROCEDURE of UPDATE
-  echo -e "\n\e[1;33m SOFT UPDATE FROM SEVER through $CWD.\n\e[0m"
-  echo CPU $(sudo dmidecode -t system | grep Serial)
-  echo  -e "\n\e[1;33m  1 Check connection to Server by ping  \e[0m"
+echo -e "\n   SOFT UPDATE FROM SEVER through $CWD."
+echo "     " CPU $(sudo dmidecode -t system | grep Serial)
+
+# SERVER PING AND ARCHIVE COPY
+if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or --ping
+  echo  -e "\n\n  CHECK connection to Server by ping"
   ping 77.222.152.213 -c2
   if [ $? -eq 0 ]; then 
-    if [ "$1" == "--ping" ]; then exit 0; fi
-    echo -e "\e[1;32m==Server is connected\e[0m"
+    echo -e "==Server is connected"
   else 
-    echo -e "\e[1;31m==No ping of Server. \nExit\e[0m"
-    exit 10
+    echo -e "==No ping of Server. \nExit"
+    exit 1
   fi
-  echo  -e "Compare arhives in Server and Local"
+
+  echo -e "\n\n  COPY of update file from Server"
   shaFile1=$(ssh -i /home/deck/.ssh/keyToServer -p 2222 pi@77.222.152.213 sha1sum /home/pi/theWD/update.7z  | cut -d " " -f 1)
   shaFile2=$(sha1sum $CWD/update.7z  | cut -d " " -f 1)
   echo Sever arhive sha:$shaFile1
   echo Local arhive sha:$shaFile2
-  if [ $shaFile1 == $shaFile2 ]; then
-    echo "Archives are same"
-  else
-    echo "Archives are different"
+  if [[ $shaFile1 != $shaFile2 ]]; then  # compare archives by SHA
+    echo "    Archives from Server and local are different"
+    echo  -e "  >>>>>> WAIT few minutes"
+    scp -i /home/deck/.ssh/keyToServer -P 2222 pi@77.222.152.213:theWD/update.7z $CWD
+    if [ $? -eq 0 ]; then 
+      echo -e "==Copy is complited"
+      echo -e "==New archive in $CWD: $(date)"
+    else 
+      echo -e "Fault of copy from Server. \nExit"
+      exit 1 
+    fi
+  else echo -e "==No copy process: Archive file on Server is same to archive file on local"
   fi
 
-  echo  -e "\e[1;33m  2 Copy of update file from Server  \e[0m"
-  echo  -e "\e[1;32m  >>>>>> WAIT few minutes \e[0m"
-  scp -i /home/deck/.ssh/keyToServer -P 2222 pi@77.222.152.213:theWD/update.7z $CWD
-  if [ $? -eq 0 ]; then 
-    echo -e "\e[1;32m==Copy is complited\e[0m"
-  else 
-    echo -e "\e[1;31m==Fault of copy from Server. \nExit\e[0m"
-    exit 1 
-  fi
+  echo -e "\n\n  EXPRACTING from $CWD/update.7z"
   if [ -f "$CWD/update.7z" ]; then 
-    echo -e "\e[1;32m==Archive file $CWD/update.7z exists\e[0m"
+    echo -e "==Archive file $CWD/update.7z exists"
   else
-    echo -e "\e[1;31m==Archive file $CWD/update.7z does not exist. \nExit\e[0m"
+    echo -e "==Archive file $CWD/update.7z does not exist. \nExit"
     exit 1
   fi
-
-  echo -e "\e[1;33m  3 Remove perevios $CWD/UpDate folder  \e[0m"
+  echo -e "    Remove perevios $CWD/UpDate folder"
   rm -r $CWD/UpDate
-
-  echo -e "\e[1;33m  4 Extracting from $CWD/update.7z  \e[0m"
   # 7z -a a.7z BackUp/*
-  7z x -y $CWD/update.7z -o"$CWD"
+  7z x -y $CWD/update.7z -o"$CWD"  # extraction
   if [ $? -eq 0 ]; then
-    echo -e "\e[1;32m==Extracting is complited\e[0m"
+    echo -e "==Extracting to $CWD is complited"
   else 
-    echo -e "\e[1;31m==Extracting fault. \nExit\e[0m"
+    echo -e "==Extracting fault. \nExit"
     exit 1 
   fi
+  if [ "$1" == "--ping" ]; then exit 0; fi;
+fi # END of SERVER PING AND ARCHIVE COPY ## if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]
+
+if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
   if [ -d "$CWD/UpDate" ]; then 
     echo -e "\e[1;32m   $CWD/UpDate/ exists\e[0m"
   else
@@ -167,7 +169,7 @@ fi  ## END OF BACKUP PROCEDURE
 if [ "$1" == "-h" ]; then # print help
   echo -e "no argument  \t\t update from remote Server"
   echo -e "--backup     \t\t copy previously saved backup files to program folders"
-  echo -e "--ping    \t\t Server ping"
-  echo -e "exit=10: no ping of Server"
+  echo -e "--ping    \t\t Server ping and copy archive from Server if local archive is different"
+  echo -e "--replace    \t\t replace update files in correspondent software folders"
   exit 0
 fi
