@@ -30,12 +30,14 @@ int main(int argc, char *argv[])
             // fclose(LogF);
             return 0;
         }
-
-        // send curremt log file to Server
-        Command = string("sleep 3; scp -i /home/deck/.ssh/keyToServer -P 2222 " )
-            + string("$(pwd)/") + LogFileName
-            + string(" pi@77.222.152.213:theWD/LOGS/");
-        system(Command.c_str());
+        if(PingResult == 0) 
+        {
+            // send curremt log file to Server
+            Command = string("sleep 3; scp -i /home/deck/.ssh/keyToServer -P 2222 " )
+                + string("$(pwd)/") + LogFileName
+                + string(" pi@77.222.152.213:theWD/LOGS/");
+            system(Command.c_str());
+        }
     }
     // Run dialog
     QApplication a(argc, argv);

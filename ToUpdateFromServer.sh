@@ -20,8 +20,11 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or -
   if [ $? -eq 0 ]; then 
     echo -e "==Server is connected"
   else 
-    echo -e "==No ping of Server. \nExit"
-    exit 1
+    echo -e "==No ping of Server."
+      if [ -d "$CWD/UpDate" ] 
+        then echo -e "==Folder $CWD/UpDate exists.\nExit";  exit 0
+        else echo -e "==Folder $CWD/UpDate does not exist. No need to update. \nExit."; exit 1
+      fi
   fi
 
   echo -e "\n\n  COPY of update file from Server"
@@ -67,6 +70,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or -
     echo -e "==Extracting fault. \nExit"
     exit 1 
   fi
+  sudo -n chmod 777 -R $CWD/UpDate
   if [ "$1" == "--ping" ]; then exit 0; fi;
 fi # END of SERVER PING AND ARCHIVE COPY ## if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]
 
@@ -75,12 +79,13 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
 
   echo -e "\n\n  CHECK folder with update software files"
   if [ -d "$CWD/UpDate" ]; then 
-    echo -e "==$CWD/UpDate/ exists."
+    # if exists then update files was not copied to correspondent folders
+    echo -e "==$CWD/UpDate/ exists." 
   else
-    echo -e "    $CWD/UpDate/ dose not exist. \nExit"
+    # if does not exist then update was completed
+    echo -e "==$CWD/UpDate/ dose not exist. \nExit"
     exit 1
   fi
-  sudo -n chmod 777 -R $CWD/UpDate
 
   echo -e "\n\n  DELETE content of previous $CWD/BackUp"
   rm -r -f $CWD/BackUp
@@ -120,23 +125,24 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
     fi
   done
 
-  echo -e "\n\n  DETAILS of current software files for BackUp"
+  echo -e "\n\n  DETAILS of updated current software files"
   echo modified : created : name : size  / SHA1
   for aFile in ${!filePathList[@]}; do
       stat -c '>>> %y : %w : %n : %s' ${filePathList[$aFile]}$aFile
       echo -e "        $(sha1sum ${filePathList[$aFile]}$aFile  | cut -d " " -f 1)"
   done
 
+  # Delete UpDate folder as a sign that update is completed
   echo -e "\n\n  DELETE folder with extracted files $CWD/UpDate"
   rm -r -f $CWD/UpDate
 
   unset filePathList
   echo -e "UPDATE IS COMPLITEd"
   exit 0
-fi # END of REPLACE UPDATE FILES AND BACKUP FILE # if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
+fi # END of REPLACE UPDATE FILES AND BACKUP FILE # if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]
 
 if [ "$1" == "--backup" ]; then  ## BACKUP PROCEDURE
-  echo -e "  PROCEDURE of COPY BACK previously saved backup files from $CWD/UpDate"
+  echo -e "  PROCEDURE of COPY BACK previously saved backup files from $CWD/BackUp"
   # Check existance of BackUp folder
   if [ -d "$CWD/BackUp" ]; then 
     echo -e "    $CWD/BackUp/ exists\e[0m"
