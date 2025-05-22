@@ -3,8 +3,12 @@
 #include "dialog.h"
 using namespace std;
 
+int handleOfPostpone(int WaitTime = 30);
+
 int main(int argc, char *argv[])
 {
+    // if(handleOfPostpone()) return 0;
+
     if(argc<=1)
     {
         time_t now = time(0);
@@ -45,4 +49,28 @@ int main(int argc, char *argv[])
     w.Mode = (argc>1)?1:0;
     w.show();
     return a.exec();
+}
+
+int handleOfPostpone(int WaitTime)
+{
+    FILE* Fpost = fopen("PostponedUpdateTime", "r");
+    if(Fpost){
+        unsigned long long int T = 0;
+        fscanf(Fpost, "%lld", &T);
+        fclose(Fpost);
+
+        unsigned long long int dT = (Dialog::getTimeNS() -T) / 1e9;
+        
+        FILE* LogF = fopen("waitForPostponedUpdate.txt", "w");
+        fprintf(LogF, "Read time %lld ns\ntime since postpone %lld sec\nleft %lld sec", T, dT, WaitTime - dT);
+        fclose(LogF);
+
+        if(dT < WaitTime) return 1;
+        else
+        {
+            remove("PostponedUpdateTime");
+            remove("waitForPostponedUpdate.txt");
+        }
+    }
+    return 0;
 }

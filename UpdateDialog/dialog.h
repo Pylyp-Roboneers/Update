@@ -29,11 +29,12 @@ private slots:
 private:
     Ui::Dialog *ui;
 
-    unsigned long long int getTimeNS()
+public:
+    static unsigned long long int getTimeNS()
     {
         return (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())).count();
     }
-    double getTimeSec()
+    static double getTimeSec()
     {
         static unsigned long long int time0 = getTimeNS();
         return 1e-9 * double( getTimeNS() - time0);

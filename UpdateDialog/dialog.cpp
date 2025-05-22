@@ -19,7 +19,7 @@ Dialog::~Dialog()
 void Dialog::on_pushButton_clicked()
 {
     system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --replace | tee $LogFileName;\""
+        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --replace | tee $LogFileName; sleep 5;\""
         " sleep 3; konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
         // " sleep 3; konsole -e $SHELL -c \"cp $LogFileName /home/deck/Downloads/1\"");
 
@@ -37,14 +37,12 @@ void Dialog::on_pushButton_2_clicked()
 // Handler of "Later" button
 void Dialog::on_pushButton_3_clicked()
 {
-    FILE* F = fopen("PostUpdeateTimer", "w");
+    FILE* F = fopen("PostponedUpdateTime", "w");
     fprintf(F, "%lld", getTimeNS());
     fclose(F);
     
-    // minimaze dalog and stat timer
-    // to show dialog after defined time by LaterTimerHandler()
-    this->showMinimized();
-    LaterTimer.start(2000);
+    // close dialog
+    QDialog::done(0);
 }
 
 // Handler of key hit
