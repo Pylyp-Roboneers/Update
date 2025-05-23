@@ -5,5 +5,6 @@ mkdir build && cd build
 cmake ..
 make
 cd 
+sudo pkill -f "SoftUpdate"
 cp /home/deck/Downloads/1/UpdateDialog/build/SoftUpdate /home/deck/Downloads/UpDt/
 sudo chmod -R 777 /home/deck/Downloads/

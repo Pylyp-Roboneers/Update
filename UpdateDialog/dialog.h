@@ -13,12 +13,10 @@ QT_END_NAMESPACE
 class Dialog : public QDialog
 {
     Q_OBJECT
-
 public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
     QTimer LaterTimer;
-    int Mode = 0;
 
 private slots:
     void on_pushButton_clicked();
@@ -41,5 +39,19 @@ public:
     }
 };
 
-
+namespace Ui {class Dialog2;}
+class Dialog2 : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit Dialog2(QWidget *parent = nullptr);
+    ~Dialog2();
+private:
+    Ui::Dialog2 *ui;
+private slots:
+    void on_pushButton_clicked();    // handle of "Update" button
+    void on_pushButton_2_clicked();  // handle of "Back Up" button
+    void on_pushButton_3_clicked();
+    void on_pushButton_4_clicked();  // handle of "Cancel" button
+};
 #endif // DIALOG_H

@@ -7,10 +7,13 @@ int handleOfPostpone(int WaitTime = 30);
 
 int main(int argc, char *argv[])
 {
-    // if(handleOfPostpone()) return 0;
+    QApplication a(argc, argv);
+    Dialog AutoDialog;
+    Dialog2 w2; 
 
     if(argc<=1)
     {
+        // if(handleOfPostpone()) return 0;
         time_t now = time(0);
         tm* ltm = localtime(&now);   // current date and time for log file sufix
 
@@ -42,12 +45,14 @@ int main(int argc, char *argv[])
                 + string(" pi@77.222.152.213:theWD/LOGS/");
             system(Command.c_str());
         }
+    AutoDialog.show();
     }
-    // Run dialog
-    QApplication a(argc, argv);
-    Dialog w;
-    w.Mode = (argc>1)?1:0;
-    w.show();
+    else
+    {
+        w2.show();
+    }
+        // if(argc>1) {Dialog2 w2; w2.show();}
+
     return a.exec();
 }
 
