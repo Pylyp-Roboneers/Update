@@ -1,12 +1,19 @@
 #include <QApplication>
 #include <string>
 #include "dialog.h"
+#include "common.h"
 using namespace std;
 
 int handleOfPostpone(int WaitTime = 30);
 
 int main(int argc, char *argv[])
 {
+    // {
+    //     FILE* LogF = fopen("yLogStart.txt", "a");
+    //     auto ret = fprintf(LogF, "There is start");
+    //     fclose(LogF);
+    // }
+
     QApplication a(argc, argv);
     Dialog AutoDialog;
     Dialog2 w2; 
@@ -21,7 +28,9 @@ int main(int argc, char *argv[])
         sprintf(DateTime, "%02d%02d%02d_%02d%02d%02d"
             , ltm->tm_year - 100, 1 + ltm->tm_mon, ltm->tm_mday
             , ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-        string LogFileName = string("Log")+ string(DateTime) + string("copy.txt");
+        string LogFileName = string("Log")+ string(DateTime) + string("_.txt");
+
+        printLog("Start at %s\n", DateTime);
 
         // command to copy update archive from Srver with log in file
         string Command = "$(pwd)/ToUpdateFromServer.sh --ping";
@@ -29,15 +38,12 @@ int main(int argc, char *argv[])
         int PingResult = system(Command.c_str());  // run copy command
 
         // if no copied update files from Server then close the dialog
-        if(PingResult && argc <= 1) 
+        if(PingResult) 
         {
-            system((string("sudo rm -f $(pwd)/") + LogFileName).c_str());
-            // FILE* LogF = fopen("pingLog.txt", "w");
-            // fprintf(LogF, "The result of ping: %d", PingResult);
-            // fclose(LogF);
+            system((string("sudo rm -f $(pwd)/") + LogFileName).c_str()); // delete empty log
             return 0;
         }
-        if(PingResult == 0) 
+        else 
         {
             // send curremt log file to Server
             Command = string("sleep 3; scp -i /home/deck/.ssh/keyToServer -P 2222 " )

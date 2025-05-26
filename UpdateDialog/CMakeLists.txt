@@ -15,6 +15,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 set(PROJECT_SOURCES
         main.cpp
         dialog.cpp
+        common.h
         dialog.h
         dialog.ui
         dialog2.ui

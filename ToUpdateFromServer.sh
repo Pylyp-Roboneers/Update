@@ -1,22 +1,26 @@
 #!/bin/bash
-# echo "11111111" | sudo -S -v  # if password to local is requered
+SERVER_USER=pi
+SERVER_ADRESS=77.222.152.213
+SERVER_PORT=2222
+SERVER_FOLER=/home/pi/theWD
+LOCAL_SSHkeyToServer=/home/deck/.ssh/keyToServer
 CWD=$( dirname "$0")  # path to this script
 # CWD="$(pwd)"  # path where the script was launched
 
 # List of update files with correspondent path
-declare -A filePathList  # key - update file name; valie = correspondent file path to update
+declare -A filePathList  # key - update file name; value = correspondent file path to update
 filePathList["autopilot_control"]="/usr/bin/"
 filePathList["gamepad_udp_run"]="/usr/bin/"
 filePathList["GUI_1_0"]="/usr/bin/"
 
 echo -e "\n   SOFT UPDATE FROM SEVER through $CWD."
-echo "     " CPU $(sudo dmidecode -t system | grep Serial)
+echo -e "CPU $(sudo dmidecode -t system | grep Serial)"
 
 # SERVER PING AND ARCHIVE COPY
 if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or --ping
 
   echo  -e "\n\n  CHECK connection to Server by ping"
-  ping 77.222.152.213 -c2
+  ping $SERVER_ADRESS -c2
   if [ $? -eq 0 ]; then 
     echo -e "==Server is connected"
   else 
@@ -28,14 +32,14 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]; then # if there is no argument or -
   fi
 
   echo -e "\n\n  COPY of update file from Server"
-  shaFile1=$(ssh -i /home/deck/.ssh/keyToServer -p 2222 pi@77.222.152.213 sha1sum /home/pi/theWD/update.7z  | cut -d " " -f 1)
+  shaFile1=$(ssh -i $LOCAL_SSHkeyToServer -p $SERVER_PORT $SERVER_USER@$SERVER_ADRESS sha1sum $SERVER_FOLER/update.7z  | cut -d " " -f 1)
   shaFile2=$(sha1sum $CWD/update.7z  | cut -d " " -f 1)
   echo Sever arhive sha:$shaFile1
   echo Local arhive sha:$shaFile2
   if [[ $shaFile1 != $shaFile2 ]]; then  # compare archives by SHA
     echo "    Archives from Server and local are different"
     echo  -e "  >>>>>> WAIT few minutes"
-    scp -i /home/deck/.ssh/keyToServer -P 2222 pi@77.222.152.213:theWD/update.7z $CWD
+    scp -i $LOCAL_SSHkeyToServer -P $SERVER_PORT $SERVER_USER@$SERVER_ADRESS:$SERVER_FOLER/update.7z $CWD
     if [ $? -eq 0 ]; then 
       echo -e "==Copy is complited"
       echo -e "==New archive in $CWD: $(date)"
