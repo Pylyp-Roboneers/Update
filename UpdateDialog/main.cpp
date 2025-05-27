@@ -8,11 +8,12 @@ int handleOfPostpone(int WaitTime = 30);
 
 int main(int argc, char *argv[])
 {
-    // {
-    //     FILE* LogF = fopen("yLogStart.txt", "a");
-    //     auto ret = fprintf(LogF, "There is start");
-    //     fclose(LogF);
-    // }
+    printLog("\nStart");
+    printLog("\nSERVER_USER:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_USER=").c_str());
+    printLog("\nSERVER_ADRESS:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_ADRESS=").c_str());
+    printLog("\nSERVER_PORT:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_PORT=").c_str());
+    printLog("\nSERVER_FOLER:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_FOLER=").c_str());
+    printLog("\nLOCAL_SSHkeyToServer:\t%s", findInFile("ToUpdateFromServer.sh", "LOCAL_SSHkeyToServer=").c_str());
 
     QApplication a(argc, argv);
     Dialog AutoDialog;

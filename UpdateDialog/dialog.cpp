@@ -85,7 +85,7 @@ void Dialog2::on_pushButton_clicked()
 {
     printLog("\nd2 Update %d %5.3f",2, 4.7);
     system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh | tee $LogFileName; sleep 3\""
+        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --full | tee $LogFileName; sleep 10\""
         " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
 }
 // handle of "Back Up" button
@@ -93,19 +93,16 @@ void Dialog2::on_pushButton_2_clicked()
 {
     printLog("\nd2 Back Up");
     system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --backup | tee $LogFileName; sleep 3\""
+        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --restore | tee $LogFileName; sleep 10\""
         " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
 }
 // handle of "Extract" button
 void Dialog2::on_pushButton_3_clicked()
 {
-
-    printLog("\nExtract");
-    printLog("\nSERVER_USER:\t%s", findInFile("ytest.txt", "SERVER_USER=").c_str());
-    printLog("\nSERVER_ADRESS:\t%s", findInFile("ytest.txt", "SERVER_ADRESS=").c_str());
-    printLog("\nSERVER_PORT:\t%s", findInFile("ytest.txt", "SERVER_PORT=").c_str());
-    printLog("\nSERVER_FOLER:\t%s", findInFile("ytest.txt", "SERVER_FOLER=").c_str());
-    printLog("\nLOCAL_SSHkeyToServer:\t%s", findInFile("ytest.txt", "LOCAL_SSHkeyToServer=").c_str());
+    printLog("\nd2 Extract %d %5.3f",2, 4.7);
+    system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
+        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --extract | tee $LogFileName; sleep 10\""
+        " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
     return;
 }
 // handle of "Cancel" button

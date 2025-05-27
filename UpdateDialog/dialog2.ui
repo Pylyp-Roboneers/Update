@@ -46,7 +46,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Back Up</string>
+    <string>Restore</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_3">

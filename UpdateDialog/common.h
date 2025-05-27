@@ -15,7 +15,7 @@ static inline unsigned long long int getTimeNS()
 {
     return (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())).count();
 }
-// returns time from first function launch in seconds
+// returns time since first function launch in seconds
 static inline double getTimeSec()
 {
     static unsigned long long int time0 = getTimeNS();
@@ -34,7 +34,7 @@ extern inline int printLog(const char* format, ...)
     va_end(vl);
     return ret;
 }
-// Function finds string in fike containing "Desct" 
+// Function finds a string line containing "Desct" in file "FileName"
 // and returs string from "Desct" end to the string end.
 // Used to find value of set in shell file
 extern inline string findInFile(const char* FileName, const char* Desct)
