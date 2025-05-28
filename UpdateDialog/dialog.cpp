@@ -5,12 +5,12 @@
 #include "./ui_dialog2.h"
 #include "QDebug"
 #include <QKeyEvent>
-#include "common.h"
 
 Dialog::Dialog(QWidget *parent): QDialog(parent), ui(new Ui::Dialog)
 {
     ui->setupUi(this);
     connect(&LaterTimer, SIGNAL(timeout()), this, SLOT(LaterTimerHandler()));
+    ServerData.update("ToUpdateFromServer.sh");
 }
 
 Dialog::~Dialog()
@@ -21,10 +21,10 @@ Dialog::~Dialog()
 // Handle of "update" button
 void Dialog::on_pushButton_clicked()
 {
-    system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --replace | tee $LogFileName; sleep 5;\""
-        " sleep 3; konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
-        // " sleep 3; konsole -e $SHELL -c \"cp $LogFileName /home/deck/Downloads/1\"");
+    system(ServerData.BashCommandWithLog("--replace").c_str());
+    // system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
+    //     " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --replace | tee $LogFileName; sleep 5;\""
+    //     " sleep 3; konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
 
     // system("konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh | tee $(pwd)/Log$(date +\"%y%m_%H%M\%S\").txt\"");
     // system("konsole -e $(pwd)/ToUpdateFromServer.sh");
@@ -56,9 +56,7 @@ void Dialog::keyPressEvent(QKeyEvent *e)
     if(e->type() == QEvent::KeyPress)
     if(e->modifiers().testFlag(Qt::AltModifier) && (char)(e->key())== Qt::Key_R)
     {
-        system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-            " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --backup | tee $LogFileName;\""
-            " sleep 3; konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
+        system(ServerData.BashCommandWithLog("--restore").c_str());
     }
 
     QDialog::keyPressEvent(e);
@@ -75,35 +73,33 @@ void Dialog::LaterTimerHandler()
 Dialog2::Dialog2(QWidget *parent): QDialog(parent), ui(new Ui::Dialog2)
 {
     ui->setupUi(this);
+    ServerData.update("ToUpdateFromServer.sh");
 }
 Dialog2::~Dialog2()
 {
     delete ui;
 }
+
 // handle of "Update" button
 void Dialog2::on_pushButton_clicked()
 {
-    printLog("\nd2 Update %d %5.3f",2, 4.7);
-    system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --full | tee $LogFileName; sleep 10\""
-        " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
+    printLog("\nDialog2 Update %d %5.3f",2, 4.7);
+    // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--full").c_str());
+    system(ServerData.BashCommandWithLog("--full").c_str());
 }
 // handle of "Back Up" button
 void Dialog2::on_pushButton_2_clicked()
 {
-    printLog("\nd2 Back Up");
-    system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --restore | tee $LogFileName; sleep 10\""
-        " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
+    printLog("\nDialog2 Back Up");
+    // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--full").c_str());
+    system(ServerData.BashCommandWithLog("--restore").c_str());
 }
 // handle of "Extract" button
 void Dialog2::on_pushButton_3_clicked()
 {
-    printLog("\nd2 Extract %d %5.3f",2, 4.7);
-    system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --extract | tee $LogFileName; sleep 10\""
-        " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
-    return;
+    printLog("\nDialog2 Extract %d %5.3f",2, 4.7);
+    // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--extract").c_str());
+    system(ServerData.BashCommandWithLog("--extract").c_str());
 }
 // handle of "Cancel" button
 void Dialog2::on_pushButton_4_clicked()

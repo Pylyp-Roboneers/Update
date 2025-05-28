@@ -4,24 +4,20 @@
 #include "common.h"
 using namespace std;
 
-int handleOfPostpone(int WaitTime = 30);
+int handleOfPostpone(int WaitTimeSec = 259200);
 
 int main(int argc, char *argv[])
 {
-    printLog("\nStart");
-    printLog("\nSERVER_USER:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_USER=").c_str());
-    printLog("\nSERVER_ADRESS:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_ADRESS=").c_str());
-    printLog("\nSERVER_PORT:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_PORT=").c_str());
-    printLog("\nSERVER_FOLER:\t%s", findInFile("ToUpdateFromServer.sh", "SERVER_FOLER=").c_str());
-    printLog("\nLOCAL_SSHkeyToServer:\t%s", findInFile("ToUpdateFromServer.sh", "LOCAL_SSHkeyToServer=").c_str());
+    ServerComunicationData ServerData("ToUpdateFromServer.sh");
+    ServerData.print();
 
     QApplication a(argc, argv);
     Dialog AutoDialog;
-    Dialog2 w2; 
+    Dialog2 UserDialog; 
 
     if(argc<=1)
     {
-        // if(handleOfPostpone()) return 0;
+        if(handleOfPostpone()) return 0;
         time_t now = time(0);
         tm* ltm = localtime(&now);   // current date and time for log file sufix
 
@@ -31,7 +27,7 @@ int main(int argc, char *argv[])
             , ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
         string LogFileName = string("Log")+ string(DateTime) + string("_.txt");
 
-        printLog("Start at %s\n", DateTime);
+        printLog("\nStart at %s\n", DateTime);
 
         // command to copy update archive from Srver with log in file
         string Command = "$(pwd)/ToUpdateFromServer.sh --ping";
@@ -46,24 +42,28 @@ int main(int argc, char *argv[])
         }
         else 
         {
-            // send curremt log file to Server
-            Command = string("sleep 3; scp -i /home/deck/.ssh/keyToServer -P 2222 " )
-                + string("$(pwd)/") + LogFileName
-                + string(" pi@77.222.152.213:theWD/LOGS/");
+            // send current log file to Server
+            Command = string("sleep 3;") + ServerData.sshCopyToServerCommand( string("$(pwd)/") + LogFileName);
+            printLog("\nLog copy: %s", Command.c_str());
+            // Command = string("sleep 3; scp -i /home/deck/.ssh/keyToServer -P 2222 " )
+            //     + string("$(pwd)/") + LogFileName
+            //     + string(" pi@77.222.152.213:theWD/LOGS/");
             system(Command.c_str());
         }
-    AutoDialog.show();
+        AutoDialog.show();
     }
     else
     {
-        w2.show();
+        UserDialog.show();
     }
-        // if(argc>1) {Dialog2 w2; w2.show();}
 
     return a.exec();
 }
 
-int handleOfPostpone(int WaitTime)
+// Function handles postponed autorun of the program.
+//  WaitTimeSec -  postponed time in seconds. 
+// Start of posponed time is written in waitForPostponedUpdate.txt
+int handleOfPostpone(int WaitTimeSec)  // WaitTimeSec: 1 day = 86400 sec
 {
     FILE* Fpost = fopen("PostponedUpdateTime", "r");
     if(Fpost){
@@ -74,10 +74,10 @@ int handleOfPostpone(int WaitTime)
         unsigned long long int dT = (Dialog::getTimeNS() -T) / 1e9;
         
         FILE* LogF = fopen("waitForPostponedUpdate.txt", "w");
-        fprintf(LogF, "Read time %lld ns\ntime since postpone %lld sec\nleft %lld sec", T, dT, WaitTime - dT);
+        fprintf(LogF, "Read time %lld ns\ntime since postpone %lld sec\nleft %lld sec", T, dT, WaitTimeSec - dT);
         fclose(LogF);
 
-        if(dT < WaitTime) return 1;
+        if(dT < WaitTimeSec) return 1;
         else
         {
             remove("PostponedUpdateTime");
