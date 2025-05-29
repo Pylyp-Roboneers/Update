@@ -13,6 +13,13 @@ filePathList["autopilot_control"]="/usr/bin/"
 filePathList["gamepad_udp_run"]="/usr/bin/"
 filePathList["GUI_1_0"]="/usr/bin/"
 
+# sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
+# source $CWD/UpDate/UpdatePathList
+# for aFile in ${!filePathList[@]}; do
+#   echo ${filePathList[$aFile]}$aFile
+# done
+# exit 0
+
 printFileDetails()
 {
   echo modified : created : name : size  / SHA1
@@ -94,7 +101,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ] || [ "$1" == "--full" ]; then
 fi # END of SERVER PING AND ARCHIVE COPY ## if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]
 
 # REPLACE UPDATE SOFTWARE FILES AND BACKUP PREVIOUS FILE
-if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ]; then
+if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ] || [ "$1" == "--test" ]; then
 
   echo -e "\n  CHECK folder with extracted update files"
   if [ -d "$CWD/UpDate" ]; then 
@@ -106,12 +113,25 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ]; then
     exit 1
   fi
 
+  # Reading of update file path for correspondent file
+  if [ ! -f "$CWD/UpDate/UpdatePathList" ]; 
+    then echo -e "==UpdatePathList dose not exist. \nExit"; exit 1
+  fi
+  sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
+  unset filePathList
+  declare -A filePathList  # key - update file name; value = correspondent file path to update
+  source $CWD/UpDate/UpdatePathList
+  echo The File path list
+  for aFile in ${!filePathList[@]}; do
+    echo ${filePathList[$aFile]}$aFile
+  done
+  
   echo -e "\n  STOP correspondent processes"
   stopProcesses
 
   echo -e "\n  DETAILS of previous software files"
   printFileDetails "<<<"
-
+stop 0
   # BackUp procedure
   if [ "$1" != "--full" ]; then # if --full then no back-up
 
@@ -130,7 +150,12 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ]; then
       fi
     done
     echo -e "==BackUp complited"
-  fi # end bach-up
+    # BackUp of UpdatePathList
+    sudo -n cp $CWD/UpDate/UpdatePathList  $CWD/BackUp/
+    if [ ! -f "$CWD/BackUp/UpdatePathList" ]; 
+      then echo -e "    Backup of UpdatePathList dose not exist. \nExit"; exit 1
+    fi
+  fi # end back-up
 
   echo -e "\n  REPLACE software UpDate files"
   for aFile in ${!filePathList[@]}; do
@@ -161,6 +186,19 @@ if [ "$1" == "--restore" ]; then
     then echo -e "==$CWD/BackUp/ exists."
     else echo -e "==$CWD/BackUp/ dose not exist.\nFault BackUp \nExit"; exit 1
   fi
+
+  # Reading of update file path for correspondent file
+  if [ ! -f "$CWD/BackUp/UpdatePathList" ]; 
+    then echo -e "==$CWD/BackUp/UpdatePathList dose not exist. \nExit"; exit 1
+  fi
+  sed -i -e 's/\r$//' $CWD/BackUp/UpdatePathList
+  unset filePathList
+  declare -A filePathList  # key - update file name; value = correspondent file path to update
+  source $CWD/BackUp/UpdatePathList
+  echo The File path list
+  for aFile in ${!filePathList[@]}; do
+    echo ${filePathList[$aFile]}$aFile
+  done
 
   echo -e "\n  STOP correspondent processes"
   stopProcesses
@@ -203,6 +241,26 @@ if [ "$1" == "--extract" ]; then
   fi
   sudo -n chmod 777 -R $CWD/UpDate
 
+  # Reading of update file path for correspondent file
+  if [ ! -f "$CWD/UpDate/UpdatePathList" ]; 
+    then echo -e "==UpdatePathList dose not exist. \nExit"; exit 1
+  fi
+  sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
+  unset filePathList
+  declare -A filePathList  # key - update file name; value = correspondent file path to update
+  source $CWD/UpDate/UpdatePathList
+  echo The File path list
+  for aFile in ${!filePathList[@]}; do
+    echo ${filePathList[$aFile]}$aFile
+  done
+
+  # # Reading of update file path for correspondent file
+  # if [ ! -f "$CWD/UpDate/UpdatePathList" ]; 
+  #   then echo -e "==UpdatePathList dose not exist. \nExit"; exit 1
+  # fi
+  # sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
+  # source $CWD/UpDate/UpdatePathList
+
   echo -e "==STOP correspondent processes"
   stopProcesses
 
@@ -233,5 +291,6 @@ if [ "$1" == "-h" ]; then # print help
   echo -e "--ping    \t\t Server ping and copy archive from Server if local archive is different"
   echo -e "--replace    \t\t replace update files from /UpDate in correspondent software folders"
   echo -e "--extract    \t\t extract existed archive file and replace update files"
+  echo -e "--full     \t\t update from remote Server without version control and without back-up" 
   exit 0
 fi

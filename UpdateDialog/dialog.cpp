@@ -9,7 +9,6 @@
 Dialog::Dialog(QWidget *parent): QDialog(parent), ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-    connect(&LaterTimer, SIGNAL(timeout()), this, SLOT(LaterTimerHandler()));
     ServerData.update("ToUpdateFromServer.sh");
 }
 
@@ -22,12 +21,6 @@ Dialog::~Dialog()
 void Dialog::on_pushButton_clicked()
 {
     system(ServerData.BashCommandWithLog("--replace").c_str());
-    // system("LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-    //     " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --replace | tee $LogFileName; sleep 5;\""
-    //     " sleep 3; konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\"");
-
-    // system("konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh | tee $(pwd)/Log$(date +\"%y%m_%H%M\%S\").txt\"");
-    // system("konsole -e $(pwd)/ToUpdateFromServer.sh");
     QDialog::done(0);
 }
 
@@ -40,6 +33,7 @@ void Dialog::on_pushButton_2_clicked()
 // Handler of "Later" button
 void Dialog::on_pushButton_3_clicked()
 {
+    // save current time to postpone autorun
     FILE* F = fopen("PostponedUpdateTime", "w");
     fprintf(F, "%lld", getTimeNS());
     fclose(F);
@@ -61,14 +55,6 @@ void Dialog::keyPressEvent(QKeyEvent *e)
 
     QDialog::keyPressEvent(e);
 }
-
-// Timer handler to proceed dialog later on defined time 
-void Dialog::LaterTimerHandler()
-{
-    this->showNormal();
-    LaterTimer.stop();
-}
-
 
 Dialog2::Dialog2(QWidget *parent): QDialog(parent), ui(new Ui::Dialog2)
 {

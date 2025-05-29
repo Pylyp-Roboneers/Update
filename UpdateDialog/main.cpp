@@ -4,10 +4,11 @@
 #include "common.h"
 using namespace std;
 
-int handleOfPostpone(int WaitTimeSec = 259200);
+int handleOfPostpone(int WaitTimeSec = 259200); // 259200 sec = 3 deys
 
 int main(int argc, char *argv[])
 {
+    printLog("Start. Arguments number %d\n", argc);
     ServerComunicationData ServerData("ToUpdateFromServer.sh");
     ServerData.print();
 
@@ -27,8 +28,6 @@ int main(int argc, char *argv[])
             , ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
         string LogFileName = string("Log")+ string(DateTime) + string("_.txt");
 
-        printLog("\nStart at %s\n", DateTime);
-
         // command to copy update archive from Srver with log in file
         string Command = "$(pwd)/ToUpdateFromServer.sh --ping";
         Command += string(" > $(pwd)/") + LogFileName; // print in log file
@@ -45,9 +44,6 @@ int main(int argc, char *argv[])
             // send current log file to Server
             Command = string("sleep 3;") + ServerData.sshCopyToServerCommand( string("$(pwd)/") + LogFileName);
             printLog("\nLog copy: %s", Command.c_str());
-            // Command = string("sleep 3; scp -i /home/deck/.ssh/keyToServer -P 2222 " )
-            //     + string("$(pwd)/") + LogFileName
-            //     + string(" pi@77.222.152.213:theWD/LOGS/");
             system(Command.c_str());
         }
         AutoDialog.show();
