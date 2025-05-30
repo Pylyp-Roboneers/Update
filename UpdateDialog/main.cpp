@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     if(argc<=1)
     {
-        if(handleOfPostpone()) return 0;
+        if(handleOfPostpone(stoi(ServerData.AUTORUN_POSTPONE_TIME_SEC))) return 0;
         time_t now = time(0);
         tm* ltm = localtime(&now);   // current date and time for log file sufix
 

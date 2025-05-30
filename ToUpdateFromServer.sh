@@ -4,6 +4,7 @@ SERVER_ADRESS=77.222.152.213
 SERVER_PORT=2222
 SERVER_FOLER=/home/pi/theWD
 LOCAL_SSHkeyToServer=/home/deck/.ssh/keyToServer
+AUTORUN_POSTPONE_TIME_SEC=40
 CWD=$( dirname "$0")  # path to this script
 # CWD="$(pwd)"  # path where the script was launched
 

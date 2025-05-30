@@ -16,6 +16,7 @@ struct ServerComunicationData
     string SERVER_PORT = "None";
     string SERVER_FOLER = "None";
     string LOCAL_SSHkeyToServer = "None";
+    string AUTORUN_POSTPONE_TIME_SEC =  "259200";
     ServerComunicationData(){}
     ServerComunicationData(const char* ShFileName)
     {
@@ -29,6 +30,7 @@ struct ServerComunicationData
         SERVER_PORT = findInFile(ShFileName, "SERVER_PORT=");
         SERVER_FOLER = findInFile(ShFileName, "SERVER_FOLER=");
         LOCAL_SSHkeyToServer = findInFile(ShFileName, "LOCAL_SSHkeyToServer=");
+        AUTORUN_POSTPONE_TIME_SEC = findInFile(ShFileName, "AUTORUN_POSTPONE_TIME_SEC=");
     }
     string sshCopyToServerCommand(string source)
     {
@@ -60,6 +62,8 @@ struct ServerComunicationData
         printLog("\nSERVER_PORT:\t%s", SERVER_PORT.c_str());
         printLog("\nSERVER_FOLER:\t%s", SERVER_FOLER.c_str());
         printLog("\nLOCAL_SSHkeyToServer:\t%s", LOCAL_SSHkeyToServer.c_str());
+        printLog("\nAUTORUN_POSTPONE_TIME_SEC:\t%s (%d sec)"
+            , AUTORUN_POSTPONE_TIME_SEC.c_str(), stoi(AUTORUN_POSTPONE_TIME_SEC));
         printLog("\n%s", sshCopyToServerCommand("Source").c_str());
     }
 };

@@ -37,9 +37,8 @@ void Dialog::on_pushButton_3_clicked()
     FILE* F = fopen("PostponedUpdateTime", "w");
     fprintf(F, "%lld", getTimeNS());
     fclose(F);
-    
-    // close dialog
-    QDialog::done(0);
+   
+    QDialog::done(0);  // close dialog
 }
 
 // Handler of key hit
@@ -69,7 +68,7 @@ Dialog2::~Dialog2()
 // handle of "Update" button
 void Dialog2::on_pushButton_clicked()
 {
-    printLog("\nDialog2 Update %d %5.3f",2, 4.7);
+    printLog("\nDialog2 Update");
     // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--full").c_str());
     system(ServerData.BashCommandWithLog("--full").c_str());
 }
@@ -90,6 +89,6 @@ void Dialog2::on_pushButton_3_clicked()
 // handle of "Cancel" button
 void Dialog2::on_pushButton_4_clicked()
 {
-    printLog("\nd2 Cansel");
+    printLog("\nd2 Cancel");
     QDialog::done(0);  // close dialog
 }
