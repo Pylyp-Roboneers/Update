@@ -35,7 +35,7 @@ struct ServerComunicationData
     string sshCopyToServerCommand(string source)
     {
          //scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/
-        string Command = string(" scp -i ") + LOCAL_SSHkeyToServer + " -P " + SERVER_PORT  + " ";
+        string Command = string(" scp ") + LOCAL_SSHkeyToServer + " -P " + SERVER_PORT  + " ";
         Command += source + " " + SERVER_USER + "@" + SERVER_ADRESS 
             + string(":") + SERVER_FOLER + "/LOGS";
         return Command;
@@ -45,7 +45,7 @@ struct ServerComunicationData
         string Command = "LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;";
         Command += " konsole -e $SHELL -c \"$(pwd)/";
         Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 10;\"";
-        Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp -i ";
+        Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp ";
         Command += LOCAL_SSHkeyToServer + string(" -P ") + SERVER_PORT;
         Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
         Command += SERVER_FOLER + "/LOGS/\"";

@@ -1,9 +1,10 @@
 #!/bin/bash
+# echo "11111111" | sudo -S -v  # if password to local is requered
 SERVER_USER=pi
 SERVER_ADRESS=77.222.152.213
 SERVER_PORT=2222
 SERVER_FOLER=/home/pi/theWD
-LOCAL_SSHkeyToServer=/home/deck/.ssh/keyToServer
+LOCAL_SSHkeyToServer="-i /home/deck/.ssh/keyToServer"
 AUTORUN_POSTPONE_TIME_SEC=40
 CWD=$( dirname "$0")  # path to this script
 # CWD="$(pwd)"  # path where the script was launched
@@ -57,7 +58,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ] || [ "$1" == "--full" ]; then
   fi
 
   echo -e "\n\n  COPY of update file from Server"
-  shaFile1=$(ssh -i $LOCAL_SSHkeyToServer -p $SERVER_PORT $SERVER_USER@$SERVER_ADRESS sha1sum $SERVER_FOLER/update.7z  | cut -d " " -f 1)
+  shaFile1=$(ssh $LOCAL_SSHkeyToServer -p $SERVER_PORT $SERVER_USER@$SERVER_ADRESS sha1sum $SERVER_FOLER/update.7z  | cut -d " " -f 1)
   shaFile2=$(sha1sum $CWD/update.7z  | cut -d " " -f 1)
   echo Sever arhive sha:$shaFile1
   echo Local arhive sha:$shaFile2
@@ -65,7 +66,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ] || [ "$1" == "--full" ]; then
   if [[ $shaFile1 != $shaFile2 ]] || [ "$1" == "--full" ]; then  
     if [ "$1" != "--full" ]; then echo "==Archives from Server and local are different"; fi
     echo  -e "  >>>>>> WAIT few minutes"
-    scp -i $LOCAL_SSHkeyToServer -P $SERVER_PORT $SERVER_USER@$SERVER_ADRESS:$SERVER_FOLER/update.7z $CWD
+    scp $LOCAL_SSHkeyToServer -P $SERVER_PORT $SERVER_USER@$SERVER_ADRESS:$SERVER_FOLER/update.7z $CWD
     if [ $? -eq 0 ]; then 
       echo -e "==Copy of archive file from Server to local is complited"
       echo -e "==New archive in $CWD: $(date)"
