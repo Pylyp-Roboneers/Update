@@ -29,8 +29,11 @@ int main(int argc, char *argv[])
         string LogFileName = string("Log")+ string(DateTime) + string("_.txt");
 
         // command to copy update archive from Srver with log in file
-        string Command = "$(pwd)/ToUpdateFromServer.sh --ping";
+        string Command = "";
+        // Command += " konsole -e $SHELL -c \"";
+        Command += "$(pwd)/ToUpdateFromServer.sh --ping";
         Command += string(" > $(pwd)/") + LogFileName; // print in log file
+        // Command += "\"";
         int PingResult = system(Command.c_str());  // run copy command
 
         // if no copied update files from Server then close the dialog

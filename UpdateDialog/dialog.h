@@ -28,14 +28,16 @@ struct ServerComunicationData
         SERVER_USER = findInFile(ShFileName, "SERVER_USER=");
         SERVER_ADRESS = findInFile(ShFileName, "SERVER_ADRESS=");
         SERVER_PORT = findInFile(ShFileName, "SERVER_PORT=");
+        if(SERVER_PORT!="") SERVER_PORT = " -P " + SERVER_PORT;
         SERVER_FOLER = findInFile(ShFileName, "SERVER_FOLER=");
         LOCAL_SSHkeyToServer = findInFile(ShFileName, "LOCAL_SSHkeyToServer=");
+            if (LOCAL_SSHkeyToServer!="") LOCAL_SSHkeyToServer=string(" -i ") + LOCAL_SSHkeyToServer;
         AUTORUN_POSTPONE_TIME_SEC = findInFile(ShFileName, "AUTORUN_POSTPONE_TIME_SEC=");
     }
     string sshCopyToServerCommand(string source)
     {
          //scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/
-        string Command = string(" scp ") + LOCAL_SSHkeyToServer + " -P " + SERVER_PORT  + " ";
+        string Command = string(" scp ") + LOCAL_SSHkeyToServer + SERVER_PORT  + " ";
         Command += source + " " + SERVER_USER + "@" + SERVER_ADRESS 
             + string(":") + SERVER_FOLER + "/LOGS";
         return Command;
@@ -46,7 +48,7 @@ struct ServerComunicationData
         Command += " konsole -e $SHELL -c \"$(pwd)/";
         Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 10;\"";
         Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp ";
-        Command += LOCAL_SSHkeyToServer + string(" -P ") + SERVER_PORT;
+        Command += LOCAL_SSHkeyToServer + SERVER_PORT;
         Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
         Command += SERVER_FOLER + "/LOGS/\"";
         return Command;
