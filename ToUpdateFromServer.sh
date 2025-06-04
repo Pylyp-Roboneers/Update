@@ -23,13 +23,6 @@ filePathList["autopilot_control"]="/usr/bin/"
 filePathList["gamepad_udp_run"]="/usr/bin/"
 filePathList["GUI_1_0"]="/usr/bin/"
 
-# sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
-# source $CWD/UpDate/UpdatePathList
-# for aFile in ${!filePathList[@]}; do
-#   echo ${filePathList[$aFile]}$aFile
-# done
-# exit 0
-
 printFileDetails()
 {
   echo modified : created : name : size  / SHA1
@@ -45,6 +38,19 @@ stopProcesses()
     pkill -f "$aFile"
   done
   sleep 3  # wait to processes are completely stop
+}
+checkDiskSpace()
+{
+  SIZEkB_Disk=$((df --output=avail --out=target | grep /home) | cut -d " " -f 1 )
+  SIZEkB_Packed=$(( $(stat -c '%s' update.7z) /1000))
+  SIZEkB_UnPacked=$(( $((7z l update.7z | tail -n 1) | awk '{print $3}') /1000))
+  SIZEkB_Required=$(($SIZEkB_Packed + (2 * $SIZEkB_UnPacked)))
+  echo "Disck Avalable=$SIZEkB_Disk kB; Packed File=$SIZEkB_Packed kB; Unpacked=$SIZEkB_UnPacked kB"
+  echo "Required Space=$SIZEkB_Required kB = 2 * Unpacked + Packed File"
+  if [[ $SIZEkB_Disk > $SIZEkB_Required ]]; 
+      then echo "There is enoght space"; return 0
+      else echo "There is NO space";  return 1
+  fi
 }
 
 echo -e "\n   SOFT UPDATE FROM SERVER through $CWD. Procedure $1"
@@ -264,13 +270,6 @@ if [ "$1" == "--extract" ]; then
     echo ${filePathList[$aFile]}$aFile
   done
 
-  # # Reading of update file path for correspondent file
-  # if [ ! -f "$CWD/UpDate/UpdatePathList" ]; 
-  #   then echo -e "==UpdatePathList dose not exist. \nExit"; exit 1
-  # fi
-  # sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
-  # source $CWD/UpDate/UpdatePathList
-
   echo -e "==STOP correspondent processes"
   stopProcesses
 
@@ -295,6 +294,11 @@ if [ "$1" == "--extract" ]; then
   exit 0
 fi  # End OF EXTRACTION PROCEDURE
 
+if [ "$1" == "--checkspace" ]; then
+  checkDiskSpace
+  exit $?
+fi
+
 if [ "$1" == "-h" ]; then # print help
   echo -e "no argument  \t\t update from remote Server"
   echo -e "--restore    \t\t copy previously saved backup files in /BackUp in program folders"
@@ -302,5 +306,6 @@ if [ "$1" == "-h" ]; then # print help
   echo -e "--replace    \t\t replace update files from /UpDate in correspondent software folders"
   echo -e "--extract    \t\t extract existed archive file and replace update files"
   echo -e "--full     \t\t update from remote Server without version control and without back-up" 
+  echo -e "--checkspace\t\t check available disk space for update" 
   exit 0
 fi
