@@ -46,11 +46,15 @@ struct ServerComunicationData
     {
         string Command = "LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;";
         Command += " konsole -e $SHELL -c \"$(pwd)/";
-        Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 10;\"";
-        Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp ";
+        Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 7;\"";
+        Command += "\n sleep 3; \n scp ";
         Command += LOCAL_SSHkeyToServer + SERVER_PORT;
         Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
-        Command += SERVER_FOLER + "/LOGS/\"";
+        Command += SERVER_FOLER + "/LOGS/";
+        // Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp ";
+        // Command += LOCAL_SSHkeyToServer + SERVER_PORT;
+        // Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
+        // Command += SERVER_FOLER + "/LOGS/\"";
         return Command;
         // "LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
         // " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --extract | tee $LogFileName; sleep 10\""
@@ -88,6 +92,7 @@ private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
     void keyPressEvent(QKeyEvent *e);
+    void resizeEvent(QResizeEvent *event);
 private:
     Ui::Dialog *ui;
 
@@ -118,5 +123,6 @@ private slots:
     void on_pushButton_2_clicked();  // handle of "Back Up" button
     void on_pushButton_3_clicked();
     void on_pushButton_4_clicked();  // handle of "Cancel" button
+    void resizeEvent(QResizeEvent *event);
 };
 #endif // DIALOG_H

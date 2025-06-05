@@ -4,22 +4,22 @@
  <widget class="QDialog" name="Dialog2">
   <property name="geometry">
    <rect>
-    <x>50</x>
-    <y>50</y>
-    <width>160</width>
-    <height>390</height>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Update by User</string>
+   <string>Менеджер оновлень</string>
   </property>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>140</width>
-     <height>80</height>
+     <x>456</x>
+     <y>450</y>
+     <width>368</width>
+     <height>68</height>
     </rect>
    </property>
    <property name="font">
@@ -28,16 +28,16 @@
     </font>
    </property>
    <property name="text">
-    <string>Full Update</string>
+    <string>ЗАВАНТАЖИТИ ТА ВСТАНОВИТИ ВЕРСІЮ З СЕРВЕРА</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>100</y>
-     <width>140</width>
-     <height>80</height>
+     <x>650</x>
+     <y>23</y>
+     <width>605</width>
+     <height>68</height>
     </rect>
    </property>
    <property name="font">
@@ -46,16 +46,16 @@
     </font>
    </property>
    <property name="text">
-    <string>Restore</string>
+    <string>Повернути попередню версію</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>190</y>
-     <width>140</width>
-     <height>80</height>
+     <x>23</x>
+     <y>660</y>
+     <width>605</width>
+     <height>68</height>
     </rect>
    </property>
    <property name="font">
@@ -70,10 +70,10 @@
   <widget class="QPushButton" name="pushButton_4">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>280</y>
-     <width>140</width>
-     <height>80</height>
+     <x>639</x>
+     <y>660</y>
+     <width>605</width>
+     <height>68</height>
     </rect>
    </property>
    <property name="font">
@@ -82,7 +82,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Cancel</string>
+    <string>Вихід</string>
    </property>
   </widget>
  </widget>

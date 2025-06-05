@@ -49,10 +49,12 @@ int main(int argc, char *argv[])
             printLog("\nLog copy: %s", Command.c_str());
             system(Command.c_str());
         }
+        AutoDialog.showMaximized();
         AutoDialog.show();
     }
     else
     {
+        UserDialog.showMaximized();
         UserDialog.show();
     }
 
