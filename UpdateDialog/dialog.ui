@@ -46,7 +46,7 @@
     </font>
    </property>
    <property name="text">
-    <string>НАГАДАТИ ПРИ НАСТУПНОМУ ПІДКЛЮЧЕННІ</string>
+    <string>НАГАДАТИ ПРИ НАСТУПНОМУ УВІМКНЕННІ</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_3">
