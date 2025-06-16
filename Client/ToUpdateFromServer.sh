@@ -4,8 +4,8 @@ SERVER_USER=pi
 SERVER_ADRESS=10.168.103.1
 SERVER_PORT=
 SERVER_FOLER=/home/pi/theWD
-LOCAL_SSHkeyToServer=/home/deck/.ssh/keyToServer
-AUTORUN_POSTPONE_TIME_SEC=40
+LOCAL_SSHkeyToServer=/home/deck/.ssh/keyToServer1
+AUTORUN_POSTPONE_TIME_SEC=259200
 CWD=$( dirname "$0")  # path to this script
 # CWD="$(pwd)"  # path where the script was launched
 
@@ -56,77 +56,28 @@ checkDiskSpace()
 echo -e "\n   SOFT UPDATE FROM SERVER through $CWD. Procedure $1"
 echo -e "CPU $(sudo dmidecode -t system | grep Serial)"
 
-# SERVER PING AND ARCHIVE COPY
-if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ] || [ "$1" == "--full" ]; then
-
-  echo  -e "\n\n  CHECK connection to Server by ping"
-  ping $SERVER_ADRESS -c2
-  if [ $? -eq 0 ]; then 
-    echo -e "==Server is connected"
-  else 
-    echo -e "==No ping of Server."
-      if [ -d "$CWD/UpDate" ] 
-        then echo -e "==Folder $CWD/UpDate exists.\nExit";  exit 0
-        else echo -e "==Folder $CWD/UpDate does not exist. No need to update. \nExit."; exit 1
-      fi
+if [ "$1" == "--ping" ]; then
+  echo -e "\n  CHECK folder $CWD/UpDate with extracted update files"
+  if [ -d "$CWD/UpDate" ]; then 
+    # if exists then update files was not copied to correspondent folders
+    echo -e "==$CWD/UpDate/ exists.\nExit"; exit 0
+  else
+    # if does not exist then update was completed
+    echo -e "==$CWD/UpDate/ dose not exist.\nExit"; exit 1
   fi
-
-  echo -e "\n\n  COPY of update file from Server"
-  shaFile1=$(ssh $LOCAL_SSHkeyToServer $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS sha1sum $SERVER_FOLER/update.7z  | cut -d " " -f 1)
-  shaFile2=$(sha1sum $CWD/update.7z  | cut -d " " -f 1)
-  echo Sever arhive sha:$shaFile1
-  echo Local arhive sha:$shaFile2
-  # compare archives by SHA. if SHA different or --full then copy from Server
-  if [[ $shaFile1 != $shaFile2 ]] || [ "$1" == "--full" ]; then  
-    if [ "$1" != "--full" ]; then echo "==Archives from Server and local are different"; fi
-    echo  -e "  >>>>>> WAIT few minutes"
-    scp $LOCAL_SSHkeyToServer $SERVER_PORT_Arg $SERVER_USER@$SERVER_ADRESS:$SERVER_FOLER/update.7z $CWD
-    if [ $? -eq 0 ]; then 
-      echo -e "==Copy of archive file from Server to local is complited"
-      echo -e "==New archive in $CWD: $(date)"
-    else 
-      echo -e "Fault of copy from Server. \nExit"
-      exit 1 
-    fi
-  else 
-    if [ "$1" != "--full" ]; then echo -e "==No copy process: Archive file on Server is same to archive file on local"; fi
-    if [ "$1" == "--ping" ]; then 
-      if [ -d "$CWD/UpDate" ] 
-        then echo -e "==Folder $CWD/UpDate exists.\nExit";  exit 0
-        else echo -e "==Folder $CWD/UpDate does not exist. No need to update. \nExit."; exit 1
-      fi
-    fi
-  fi
-
-  echo -e "\n\n  EXPRACTING from $CWD/update.7z"
-  if [ -f "$CWD/update.7z" ]; 
-    then echo -e "==Archive file $CWD/update.7z exists"
-    else echo -e "==Archive file $CWD/update.7z does not exist. \nExit"; exit 1
-  fi
-  echo -e "  Remove perevios $CWD/UpDate folder"
-  rm -r $CWD/UpDate
-
-  # extraction
-  7z x -y $CWD/update.7z -o"$CWD"
-  if [ $? -eq 0 ]; 
-    then echo -e "==Extracting to $CWD is complited"
-    else echo -e "==Extracting fault. \nExit";  exit 1 
-  fi
-  sudo -n chmod 777 -R $CWD/UpDate
-  if [ "$1" == "--ping" ]; then exit 0; fi;
-fi # END of SERVER PING AND ARCHIVE COPY ## if [[ "$#" -eq 0 ]] || [ "$1" == "--ping" ]
+fi 
 
 # REPLACE UPDATE SOFTWARE FILES AND BACKUP PREVIOUS FILE
-if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ] || [ "$1" == "--test" ]; then
+if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
 
   echo -e "\n  CHECK folder with extracted update files"
   if [ -d "$CWD/UpDate" ]; then 
     # if exists then update files was not copied to correspondent folders
-    echo -e "==$CWD/UpDate/ exists." 
+    echo -e "==$CWD/UpDate/ exists."
+    sudo chmod -R 777 $CWD/UpDate/
   else
     # if does not exist then update was completed
-    echo -e "==$CWD/UpDate/ dose not exist. \nExit"
-    exit 1
+    echo -e "==$CWD/UpDate/ dose not exist. \nExit"; exit 1
   fi
 
   # Reading of update file path for correspondent file
@@ -138,7 +89,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ] || [ "$1"
   declare -A filePathList  # key - update file name; value = correspondent file path to update
   source $CWD/UpDate/UpdatePathList
   echo The File path list
-  for aFile in ${!filePathList[@]}; do
+  for aFile in ${!filePathList[@]}; do  # print out update file list with path
     echo ${filePathList[$aFile]}$aFile
   done
   
@@ -149,12 +100,11 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ] || [ "$1"
   printFileDetails "<<<"
 
   # BackUp procedure
-  if [ "$1" != "--full" ]; then # if --full then no back-up
 
     echo -e "\n  DELETE content of previous back-up in $CWD/BackUp"
     rm -r -f $CWD/BackUp
     mkdir $CWD/BackUp
-    sudo -n chmod 777 -R $CWD/BackUp
+    sudo -n chmod 777 -R $CWD/BakUp
 
     echo -e "\n  COPY back-up files to $CWD/BackUp/"
     for aFile in ${!filePathList[@]}; do
@@ -171,7 +121,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ] || [ "$1"
     if [ ! -f "$CWD/BackUp/UpdatePathList" ]; 
       then echo -e "    Backup of UpdatePathList dose not exist. \nExit"; exit 1
     fi
-  fi # end back-up
+  # fi # end back-up
 
   echo -e "\n  REPLACE software UpDate files"
   for aFile in ${!filePathList[@]}; do
@@ -190,7 +140,7 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ] || [ "$1" == "--full" ] || [ "$1"
   rm -r -f $CWD/UpDate
 
   unset filePathList
-  echo -e "UPDATE IS COMPLITEd"
+  echo -e "UPDATE IS COMPLITED"
   exit 0
 fi # END of REPLACE UPDATE FILES AND BACKUP FILE # if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]
 
@@ -248,9 +198,9 @@ if [ "$1" == "--extract" ]; then
   fi
 
   echo -e "==Remove perevios $CWD/UpDate folder"
-  rm -r $CWD/UpDate
+  rm -f -r $CWD/UpDate
 
-  7z x -y $CWD/update.7z -o"$CWD"  # extraction
+  sudo 7z x -y $CWD/update.7z -o"$CWD"  # extraction
   if [ $? -eq 0 ]; 
     then echo -e "==Extracting to $CWD is complited"
     else echo -e "==Extracting fault. \nExit"; exit 1 
@@ -299,13 +249,88 @@ if [ "$1" == "--checkspace" ]; then
   exit $?
 fi
 
+if [ "$1" == "--force" ]; then
+
+  echo  -e "CHECK connection to Server by ping"
+  ping $SERVER_ADRESS -c2
+  if [ $? -eq 0 ]; 
+    then echo -e "==Server is connected";
+    else echo -e "==Server is NOT connected"; exit 1
+  fi
+
+  echo  -e ">>>>>> WAIT few minutes for Copying from Server"
+  scp $LOCAL_SSHkeyToServer $SERVER_PORT_Arg $SERVER_USER@$SERVER_ADRESS:$SERVER_FOLER/update.7z $CWD
+  if [ $? -eq 0 ]; then 
+    echo -e "==Copy of archive file from Server to local is complited"
+    echo -e "==New archive in $CWD: $(date)"
+  else 
+    echo -e "Fault of copy from Server. \nExit";  exit 1 
+  fi
+
+  echo -e "\n\n  EXPRACTING from $CWD/update.7z"
+  if [ -f "$CWD/update.7z" ]; 
+    then echo -e "==Archive file $CWD/update.7z exists"
+    else echo -e "==Archive file $CWD/update.7z does not exist. \nExit"; exit 1
+  fi
+  # extraction
+  7z x -y $CWD/update.7z -o"$CWD"
+  if [ $? -eq 0 ]; 
+    then echo -e "==Extracting to $CWD is complited"
+    else echo -e "==Extracting fault. \nExit";  exit 1 
+  fi
+  sudo -n chmod 777 -R $CWD/UpDate
+    if [ -d "$CWD/UpDate" ]; 
+    then echo -e "==$CWD/UpDate/ exists." 
+    else echo -e "==$CWD/UpDate/ dose not exist. \nExit"; exit 1
+  fi
+
+  # Reading of update file path for correspondent file
+  if [ ! -f "$CWD/UpDate/UpdatePathList" ]; 
+    then echo -e "==UpdatePathList dose not exist. \nExit"; exit 1
+  fi
+  sed -i -e 's/\r$//' $CWD/UpDate/UpdatePathList
+  unset filePathList
+  declare -A filePathList  # key - update file name; value = correspondent file path to update
+  source $CWD/UpDate/UpdatePathList
+  echo The File path list
+  for aFile in ${!filePathList[@]}; do
+    echo ${filePathList[$aFile]}$aFile
+  done
+  
+  echo -e "   STOP correspondent processes"
+  stopProcesses
+
+  echo -e "   DETAILS of previous software files"
+  printFileDetails "<<<"
+
+  echo -e "\n  REPLACE software UpDate files"
+  for aFile in ${!filePathList[@]}; do
+    sudo cp $CWD/UpDate/$aFile ${filePathList[$aFile]}$aFile
+    if [ $? -ne 0 ]; 
+      then echo -e "    replace of ${filePathList[$aFile]}$aFile is fault."; 
+      else echo ====${filePathList[$aFile]}$aFile is copied
+    fi
+  done
+
+  echo -e "\n\n  DETAILS of updated current software files"
+  printFileDetails ">>>"
+
+  echo -e "\n\n  DELETE folder with extracted files $CWD/UpDate"
+  rm -r -f $CWD/UpDate
+
+  unset filePathList
+  echo -e "EXTRACTING IS COMPLITED"
+  exit 0    
+fi
+
+
 if [ "$1" == "-h" ]; then # print help
   echo -e "no argument  \t\t update from remote Server"
   echo -e "--restore    \t\t copy previously saved backup files in /BackUp in program folders"
   echo -e "--ping    \t\t Server ping and copy archive from Server if local archive is different"
   echo -e "--replace    \t\t replace update files from /UpDate in correspondent software folders"
   echo -e "--extract    \t\t extract existed archive file and replace update files"
-  echo -e "--full     \t\t update from remote Server without version control and without back-up" 
+  echo -e "--force     \t\t update from remote Server without version control and without back-up" 
   echo -e "--checkspace\t\t check available disk space for update" 
   exit 0
 fi

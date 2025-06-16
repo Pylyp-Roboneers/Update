@@ -102,14 +102,14 @@ Dialog2::~Dialog2()
 void Dialog2::on_pushButton_clicked()
 {
     printLog("\nDialog2 Update");
-    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--full").c_str());
-    system(ServerData.BashCommandWithLog("--full").c_str());
+    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--force").c_str());
+    system(ServerData.BashCommandWithLog("--force").c_str());
 }
 // handle of "Back Up" button
 void Dialog2::on_pushButton_2_clicked()
 {
     printLog("\nDialog2 Back Up");
-    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--full").c_str());
+    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--restore").c_str());
     system(ServerData.BashCommandWithLog("--restore").c_str());
 }
 // handle of "Extract" button

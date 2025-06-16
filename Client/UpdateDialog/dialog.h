@@ -47,10 +47,14 @@ struct ServerComunicationData
         string Command = "LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;";
         Command += " konsole -e $SHELL -c \"$(pwd)/";
         Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 7;\"";
-        Command += "\n sleep 3; \n scp ";
-        Command += LOCAL_SSHkeyToServer + SERVER_PORT;
-        Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
-        Command += SERVER_FOLER + "/LOGS/";
+
+        // // Send log file to Server
+        // Command += "\n sleep 3; \n scp ";
+        // Command += LOCAL_SSHkeyToServer + SERVER_PORT;
+        // Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
+        // Command += SERVER_FOLER + "/LOGS/";
+
+        // // Send log file to Server and show console
         // Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp ";
         // Command += LOCAL_SSHkeyToServer + SERVER_PORT;
         // Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";

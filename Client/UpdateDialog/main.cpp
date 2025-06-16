@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
         }
         else 
         {
-            // send current log file to Server
-            Command = string("sleep 3;") + ServerData.sshCopyToServerCommand( string("$(pwd)/") + LogFileName);
-            printLog("\nLog copy: %s", Command.c_str());
-            system(Command.c_str());
+            // // send current log file to Server
+            // Command = string("sleep 3;") + ServerData.sshCopyToServerCommand( string("$(pwd)/") + LogFileName);
+            // printLog("\nLog copy: %s", Command.c_str());
+            // system(Command.c_str());
         }
         AutoDialog.showMaximized();
         AutoDialog.show();
