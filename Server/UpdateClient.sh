@@ -21,6 +21,8 @@ if [ $CLIENT_PORT ];
   else CLIENT_port= ; CLIENT_Port= ;
 fi
 
+echo -e "\n\nUPDATING CLIENT============================================$CLIENT_USER@$CLIENT_ADRESS"
+
 echo  -e "___CHECK archive file existence on Server."
 if [ -f $CWD/$SERVER_ArchiveFile ]; 
   then echo -e "==Achive file $CWD/$SERVER_ArchiveFile exists."
@@ -58,7 +60,7 @@ CLIENT_CPU=$($SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "sudo
 echo -n -e "\n$(date +%y.%m.%d-%H:%M:%S) $CLIENT_USER@$CLIENT_ADRESS $shaFile1 $SSHkeyToClient $CLIENT_Port $CLIENT_FOLER$SERVER_ArchiveFile $CLIENT_CPU Copied" >> Log.txt
 
 echo -e "___EXTRACT archive file on Client"
-$SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "sudo 7z x -y $CLIENT_FOLER$SERVER_ArchiveFile -o\"$CLIENT_FOLER\""
+$SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "sudo 7z x -y $CLIENT_FOLER$SERVER_ArchiveFile -o\"$CLIENT_FOLER\"; sudo chmod -R 777 $CLIENT_FOLER/UpDate;"
 # print logs of extruction result to file Log.txt
 if [ $? -eq 0 ]; 
   then echo -e "==Extracting to $CLIENT_FOLER on Client is complited"; echo -n -e ", Expracted" >> Log.txt
@@ -69,4 +71,5 @@ if $SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "[ -d \"$CLIENT
   then echo -e " $CLIENT_FOLER/UpDate exists"; echo -n -e ", Folder exists" >> Log.txt
   else echo -e " $CLIENT_FOLER/UpDate does NOT exist"; echo -n -e ", Folder NOT exist" >> Log.txt
 fi
+echo "Software copy and extraction on $CLIENT_USER@$CLIENT_ADRESS succeeded"
 exit 0
