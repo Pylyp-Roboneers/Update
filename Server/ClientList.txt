@@ -1,5 +1,5 @@
 10.168.103.8 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 admin /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
-10.168.103.5 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
+10.168.103.5 update.7z acacfec03a384deff69ec49713731b5c6281e5b2 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
 10.168.103.9 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 admin /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
 10.168.103.11 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 admin /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
 10.168.103.7 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt07

@@ -46,7 +46,8 @@
     </font>
    </property>
    <property name="text">
-    <string>НАГАДАТИ ПРИ НАСТУПНОМУ УВІМКНЕННІ</string>
+    <!-- <string>НАГАДАТИ ПРИ НАСТУПНОМУ УВІМКНЕННІ</string> -->
+    <string>ЗАКРИТИ</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_3">
@@ -113,6 +114,50 @@
    </property>
    <property name="text">
     <string>Доступна нова версія</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="companyLogo">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>/home/deck/Downloads/1/UpdateDialog/RoboneersLogo.jpg</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="companyName">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>16</y>
+     <width>182</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>/home/deck/Downloads/1/UpdateDialog/RoboneersName.jpg</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

@@ -52,13 +52,14 @@ void Dialog::keyPressEvent(QKeyEvent *e)
 }
 void Dialog::resizeEvent(QResizeEvent *event)
 {    
+    float ResX = 1280., ResY = 800.;
     int indent = 40;
     auto DlgSize = this->size();
-    float Sx = DlgSize.width() / 1920.;  // Scale X
-    float Sy = DlgSize.height() / 1200.;  // Scale Y
+    float Sx = DlgSize.width() / ResX;  // Scale X
+    float Sy = DlgSize.height() / ResY;  // Scale Y
 
     // Update button
-    ui->pushButton->setGeometry((1920- 551) * Sx /2, DlgSize.height() * 4.5/8., 551 * Sx, 100 * Sy);
+    ui->pushButton->setGeometry((ResX- 551) * Sx /2, DlgSize.height() * 4.5/8., 551 * Sx, 100 * Sy);
     QFont font = ui->pushButton->font();
     font.setPointSize(21 * Sx);
     ui->pushButton->setFont(font);
@@ -67,23 +68,26 @@ void Dialog::resizeEvent(QResizeEvent *event)
     pal.setBrush(QPalette::ButtonText, Qt::black);  // text color
     ui->pushButton->setPalette(pal);
 
-    // Cancel button
-    ui->pushButton_2->setGeometry(indent * Sx, DlgSize.height() - (indent + 100) * Sy
-        , (1920 - 3 * indent) * Sx /2, 100 * Sy);
-    ui->pushButton_2->setFont(font);
-
     // Later button
-    ui->pushButton_3->setGeometry((1920 + indent) * Sx / 2, DlgSize.height() -  (indent + 100) * Sy
-        , (1920 - 3 * indent) * Sx /2, 100 * Sy);
+    ui->pushButton_3->setGeometry(indent * Sx, DlgSize.height() - (indent + 100) * Sy
+        , (ResX - 3 * indent) * Sx /2, 100 * Sy);
     ui->pushButton_3->setFont(font);
 
+    // Cancel button
+    ui->pushButton_2->setGeometry((ResX + indent) * Sx / 2, DlgSize.height() -  (indent + 100) * Sy
+        , (ResX - 3 * indent) * Sx /2, 100 * Sy);
+    ui->pushButton_2->setFont(font);
+
     // Comment text
-    ui->textComment->setGeometry((1920- 800) * Sx /2, DlgSize.height() * 3.5/8., 800 * Sx, 100 * Sy);
+    ui->textComment->setGeometry((ResX - 800) * Sx /2, DlgSize.height() * 2.75 /8., 800 * Sx, 100 * Sy);
     ui->textComment->setStyleSheet("color: white; background-color: transparent;");
     ui->textComment->setAlignment(Qt::AlignCenter);
     QFont fontTCom = ui->textComment->font();
     fontTCom.setPointSize(30 * Sx);
     ui->textComment->setFont(fontTCom);
+
+    ui->companyLogo->setGeometry(32 * Sx, 32 * Sy, 32 * Sx, 32 * Sy);
+    ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);
 
     QDialog::resizeEvent(event);
 }
@@ -127,35 +131,39 @@ void Dialog2::on_pushButton_4_clicked()
 }
 void Dialog2::resizeEvent(QResizeEvent *event)
 {    
+    float ResX = 1280., ResY = 800.;
     int indent = 40;
     auto DlgSize = this->size();
-    float Sx = DlgSize.width() / 1920.;  // Scale X
-    float Sy = DlgSize.height() / 1200.;  // Scale Y
+    float Sx = DlgSize.width() / ResX;  // Scale X
+    float Sy = DlgSize.height() / ResY;  // Scale Y
 
-    // Update button
-    ui->pushButton->setGeometry((1920- 750) * Sx /2, DlgSize.height() * 4.5/8., 750 * Sx, 100 * Sy);
-    QFont font = ui->pushButton->font();
+    // Restore button
+    ui->pushButton_2->setGeometry((ResX - 750) * Sx /2, DlgSize.height() * 4.5 / 8., 750 * Sx, 100 * Sy);
+    QFont font = ui->pushButton_2->font();
     font.setPointSize(21 * Sx);
-    ui->pushButton->setFont(font);
+    ui->pushButton_2->setFont(font);
     QPalette pal=palette();
     pal.setBrush(QPalette::Button, QColor( 255, 255, 255));  // background color
     pal.setBrush(QPalette::ButtonText, Qt::black);  // text color
-    ui->pushButton->setPalette(pal);
+    ui->pushButton_2->setPalette(pal);
 
-    // Restore button
-    ui->pushButton_2->setGeometry( (DlgSize.width() + indent * Sx) / 2, indent * Sy
-        , (1920 - 3 * indent) * Sx /2, 100 * Sy);
-    ui->pushButton_2->setFont(font);
+    // // Update button
+    // ui->pushButton->setGeometry( (DlgSize.width() + indent * Sx) / 2, indent * Sy
+    //     , (ResX - 3 * indent) * Sx /2, 100 * Sy);
+    // ui->pushButton->setFont(font);
 
     // Extract button
     ui->pushButton_3->setGeometry(indent * Sx, DlgSize.height() - (indent + 100) * Sy
-        , (1920 - 3 * indent) * Sx /2, 100 * Sy);
+        , (ResX - 3 * indent) * Sx /2, 100 * Sy);
     ui->pushButton_3->setFont(font);
 
     // Cancel button
-    ui->pushButton_4->setGeometry((1920 + indent) * Sx / 2, DlgSize.height() -  (indent + 100) * Sy
-        , (1920 - 3 * indent) * Sx /2, 100 * Sy);
+    ui->pushButton_4->setGeometry((ResX + indent) * Sx / 2, DlgSize.height() -  (indent + 100) * Sy
+        , (ResX - 3 * indent) * Sx /2, 100 * Sy);
     ui->pushButton_4->setFont(font);
+
+    ui->companyLogo->setGeometry(32 * Sx, 32 * Sy, 32 * Sx, 32 * Sy);
+    ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);
 
     QDialog::resizeEvent(event);
 }
