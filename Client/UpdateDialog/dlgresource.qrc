@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/prgrss">
+        <file>loading.svg</file>
+    </qresource>
+    <qresource prefix="/img">
+        <file>RoboneersLogo.jpg</file>
+        <file>RoboneersName.jpg</file>
+    </qresource>
+</RCC>

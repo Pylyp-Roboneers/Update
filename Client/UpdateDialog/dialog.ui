@@ -129,7 +129,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>/home/deck/Downloads/1/UpdateDialog/RoboneersLogo.jpg</pixmap>
+    <pixmap resource="dlgresource.qrc">:/img/RoboneersLogo.jpg</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -151,7 +151,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>/home/deck/Downloads/1/UpdateDialog/RoboneersName.jpg</pixmap>
+    <pixmap resource="dlgresource.qrc">:/img/RoboneersName.jpg</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>

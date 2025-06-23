@@ -19,7 +19,9 @@ set(PROJECT_SOURCES
         dialog.h
         dialog.ui
         dialog2.ui
+        dlgresource.qrc
 )
+qt5_add_resources(PROJECT_SOURCES dlgresource.qrc)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(SoftUpdate
