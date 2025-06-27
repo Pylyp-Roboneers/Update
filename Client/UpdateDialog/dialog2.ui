@@ -13,24 +13,6 @@
   <property name="windowTitle">
    <string>Менеджер оновлень</string>
   </property>
-  <!-- <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>456</x>
-     <y>450</y>
-     <width>368</width>
-     <height>68</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>16</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>ЗАВАНТАЖИТИ ТА ВСТАНОВИТИ ВЕРСІЮ З СЕРВЕРА</string>
-   </property>
-  </widget> -->
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>

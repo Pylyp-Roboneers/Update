@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/prgrss">
-        <file>loading.svg</file>
+        <file>spinner.gif</file>
     </qresource>
     <qresource prefix="/img">
         <file>RoboneersLogo.jpg</file>

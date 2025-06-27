@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "SSH connection"
-REMOTE_ADDRESS=deck@10.168.103.7
-keyFile=keyToClnt07
+REMOTE_ADDRESS=deck@10.168.103.8
+keyFile=keyToClnt08
 
 # Generate ssh key pair
 cd /home/pi/.ssh/

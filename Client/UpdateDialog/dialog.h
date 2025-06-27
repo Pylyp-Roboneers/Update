@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <string>
 #include "common.h"
+#include "spinner.h"
 using namespace std;
 
 struct ServerComunicationData
@@ -89,6 +90,7 @@ public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
     ServerComunicationData ServerData;
+    Spinner* Spnnr;
     QTimer LaterTimer;
 
 private slots:
@@ -97,6 +99,9 @@ private slots:
     void on_pushButton_3_clicked();
     void keyPressEvent(QKeyEvent *e);
     void resizeEvent(QResizeEvent *event);
+    void stopSpinnerHandler();
+    signals:
+    void stopSpinner();
 private:
     Ui::Dialog *ui;
 
@@ -111,7 +116,6 @@ public:
         return 1e-9 * double( getTimeNS() - time0);
     }
 };
-
 namespace Ui {class Dialog2;}
 class Dialog2 : public QDialog
 {
@@ -120,6 +124,7 @@ public:
     explicit Dialog2(QWidget *parent = nullptr);
     ~Dialog2();
     ServerComunicationData ServerData;
+    Spinner* Spnnr;
 private:
     Ui::Dialog2 *ui;
 private slots:
@@ -128,5 +133,8 @@ private slots:
     void on_pushButton_3_clicked();
     void on_pushButton_4_clicked();  // handle of "Cancel" button
     void resizeEvent(QResizeEvent *event);
+    void stopSpinnerHandler();
+    signals:
+    void stopSpinner();
 };
 #endif // DIALOG_H

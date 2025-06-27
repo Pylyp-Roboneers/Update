@@ -1,15 +1,26 @@
 #include <fstream>
 #include <string>
 #include "dialog.h"
+#include "spinner.h"
 #include "./ui_dialog.h"
 #include "./ui_dialog2.h"
 #include "QDebug"
+#include <QMovie>
+#include <QLabel>
+#include <QtConcurrent/QtConcurrent>
 #include <QKeyEvent>
 
 Dialog::Dialog(QWidget *parent): QDialog(parent), ui(new Ui::Dialog)
 {
     ui->setupUi(this);
     ServerData.update("ToUpdateFromServer.sh");
+    Spnnr = new Spinner(this);
+    QObject::connect(this, SIGNAL(stopSpinner()), this, SLOT(stopSpinnerHandler()));
+}
+void Dialog::stopSpinnerHandler()
+{
+    Spnnr->stop();
+    printLog("\nstopSpinnerHandler");
 }
 Dialog::~Dialog()
 {
@@ -19,8 +30,15 @@ Dialog::~Dialog()
 // Handle of "update" button
 void Dialog::on_pushButton_clicked()
 {
-    system(ServerData.BashCommandWithLog("--replace").c_str());
-    QDialog::done(0);
+    // system(ServerData.BashCommandWithLog("--replace").c_str());
+    // QDialog::done(0);
+    Spnnr->start();
+    QtConcurrent::run([this]()
+    {
+        system(ServerData.BashCommandWithLog("--replace").c_str());
+        QDialog::done(0);
+        emit stopSpinner();
+    });
 }
 // Handle of "cancel" button
 void Dialog::on_pushButton_2_clicked()
@@ -89,6 +107,8 @@ void Dialog::resizeEvent(QResizeEvent *event)
     ui->companyLogo->setGeometry(32 * Sx, 32 * Sy, 32 * Sx, 32 * Sy);
     ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);
 
+    Spnnr->setGeometry( (DlgSize.width()-200) / 2, (DlgSize.height() - 200) / 2., 200, 200);
+
     QDialog::resizeEvent(event);
 }
 
@@ -96,6 +116,9 @@ Dialog2::Dialog2(QWidget *parent): QDialog(parent), ui(new Ui::Dialog2)
 {
     ui->setupUi(this);
     ServerData.update("ToUpdateFromServer.sh");
+
+    Spnnr = new Spinner(this);
+    QObject::connect(this, SIGNAL(stopSpinner()), this, SLOT(stopSpinnerHandler()));
 }
 Dialog2::~Dialog2()
 {
@@ -105,23 +128,52 @@ Dialog2::~Dialog2()
 // handle of "Update" button
 void Dialog2::on_pushButton_clicked()
 {
-    printLog("\nDialog2 Update");
-    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--force").c_str());
-    system(ServerData.BashCommandWithLog("--force").c_str());
+    // printLog("\nDialog2 Update");
+    // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--force").c_str());
+    // system(ServerData.BashCommandWithLog("--force").c_str());
+    Spnnr->start();
+    QtConcurrent::run([this]()
+    {
+        printLog("\nDialog2 Update");
+        printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--force").c_str());
+        system(ServerData.BashCommandWithLog("--force").c_str());
+        emit stopSpinner();
+    });
 }
 // handle of "Back Up" button
 void Dialog2::on_pushButton_2_clicked()
 {
-    printLog("\nDialog2 Back Up");
-    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--restore").c_str());
-    system(ServerData.BashCommandWithLog("--restore").c_str());
+    // printLog("\nDialog2 Back Up");
+    // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--restore").c_str());
+    // system(ServerData.BashCommandWithLog("--restore").c_str());
+    Spnnr->start();
+    QtConcurrent::run([this]()
+    {
+        printLog("\nDialog2 Back Up");
+        printLog("\non_pushButton_clicked: %s", this->ServerData.BashCommandWithLog("--restore").c_str());
+        system(this->ServerData.BashCommandWithLog("--restore").c_str());
+        emit stopSpinner();
+    });
+}
+void Dialog2::stopSpinnerHandler()
+{
+    Spnnr->stop();
+    printLog("\nstopSpinnerHandler");
 }
 // handle of "Extract" button
 void Dialog2::on_pushButton_3_clicked()
 {
-    printLog("\nDialog2 Extract %d %5.3f",2, 4.7);
-    printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--extract").c_str());
-    system(ServerData.BashCommandWithLog("--extract").c_str());
+    // printLog("\nDialog2 Extract %d %5.3f",2, 4.7);
+    // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--extract").c_str());
+    // system(ServerData.BashCommandWithLog("--extract").c_str());
+    Spnnr->start();
+    QtConcurrent::run([this]()
+    {
+        printLog("\nDialog2 Extract %d %5.3f",2, 4.7);
+        printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--extract").c_str());
+        system(ServerData.BashCommandWithLog("--extract").c_str());
+        emit stopSpinner();
+    });
 }
 // handle of "Cancel" button
 void Dialog2::on_pushButton_4_clicked()
@@ -164,6 +216,9 @@ void Dialog2::resizeEvent(QResizeEvent *event)
 
     ui->companyLogo->setGeometry(32 * Sx, 32 * Sy, 32 * Sx, 32 * Sy);
     ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);
+    // ui->progress->setGeometry((ResX - 200) * Sx /2, DlgSize.height() * 2. / 8., 200 * Sx, 200 * Sx);
+
+    Spnnr->setGeometry( (DlgSize.width()-200) / 2, (DlgSize.height() - 200) / 2., 200, 200);
 
     QDialog::resizeEvent(event);
 }

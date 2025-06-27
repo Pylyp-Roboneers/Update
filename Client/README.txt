@@ -8,7 +8,7 @@ ToUpdateFromServer.sh
 або
 розархівувати файл
 /SoftUpDt.7z
-
+sudo 7z x -y SoftUpDt.7z
 sudo chmod -R 777 /home/deck/Downloads/UpDt
 
 == Налаштування Linux
