@@ -14,12 +14,12 @@ Dialog::Dialog(QWidget *parent): QDialog(parent), ui(new Ui::Dialog)
 {
     ui->setupUi(this);
     ServerData.update("ToUpdateFromServer.sh");
-    Spnnr = new Spinner(this);
+    BusySpinner = new Spinner(this);
     QObject::connect(this, SIGNAL(stopSpinner()), this, SLOT(stopSpinnerHandler()));
 }
 void Dialog::stopSpinnerHandler()
 {
-    Spnnr->stop();
+    BusySpinner->stop();
     printLog("\nstopSpinnerHandler");
 }
 Dialog::~Dialog()
@@ -32,7 +32,7 @@ void Dialog::on_pushButton_clicked()
 {
     // system(ServerData.BashCommandWithLog("--replace").c_str());
     // QDialog::done(0);
-    Spnnr->start();
+    BusySpinner->start();
     QtConcurrent::run([this]()
     {
         system(ServerData.BashCommandWithLog("--replace").c_str());
@@ -107,7 +107,7 @@ void Dialog::resizeEvent(QResizeEvent *event)
     ui->companyLogo->setGeometry(32 * Sx, 32 * Sy, 32 * Sx, 32 * Sy);
     ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);
 
-    Spnnr->setGeometry( (DlgSize.width()-200) / 2, (DlgSize.height() - 200) / 2., 200, 200);
+    BusySpinner->setGeometry( (DlgSize.width()-200) / 2,DlgSize.height() * 0.35 - (200 / 2.), 200, 200);
 
     QDialog::resizeEvent(event);
 }
@@ -117,7 +117,7 @@ Dialog2::Dialog2(QWidget *parent): QDialog(parent), ui(new Ui::Dialog2)
     ui->setupUi(this);
     ServerData.update("ToUpdateFromServer.sh");
 
-    Spnnr = new Spinner(this);
+    BusySpinner = new Spinner(this);
     QObject::connect(this, SIGNAL(stopSpinner()), this, SLOT(stopSpinnerHandler()));
 }
 Dialog2::~Dialog2()
@@ -131,7 +131,7 @@ void Dialog2::on_pushButton_clicked()
     // printLog("\nDialog2 Update");
     // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--force").c_str());
     // system(ServerData.BashCommandWithLog("--force").c_str());
-    Spnnr->start();
+    BusySpinner->start();
     QtConcurrent::run([this]()
     {
         printLog("\nDialog2 Update");
@@ -146,7 +146,7 @@ void Dialog2::on_pushButton_2_clicked()
     // printLog("\nDialog2 Back Up");
     // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--restore").c_str());
     // system(ServerData.BashCommandWithLog("--restore").c_str());
-    Spnnr->start();
+    BusySpinner->start();
     QtConcurrent::run([this]()
     {
         printLog("\nDialog2 Back Up");
@@ -157,7 +157,7 @@ void Dialog2::on_pushButton_2_clicked()
 }
 void Dialog2::stopSpinnerHandler()
 {
-    Spnnr->stop();
+    BusySpinner->stop();
     printLog("\nstopSpinnerHandler");
 }
 // handle of "Extract" button
@@ -166,7 +166,7 @@ void Dialog2::on_pushButton_3_clicked()
     // printLog("\nDialog2 Extract %d %5.3f",2, 4.7);
     // printLog("\non_pushButton_clicked: %s", ServerData.BashCommandWithLog("--extract").c_str());
     // system(ServerData.BashCommandWithLog("--extract").c_str());
-    Spnnr->start();
+    BusySpinner->start();
     QtConcurrent::run([this]()
     {
         printLog("\nDialog2 Extract %d %5.3f",2, 4.7);
@@ -218,7 +218,7 @@ void Dialog2::resizeEvent(QResizeEvent *event)
     ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);
     // ui->progress->setGeometry((ResX - 200) * Sx /2, DlgSize.height() * 2. / 8., 200 * Sx, 200 * Sx);
 
-    Spnnr->setGeometry( (DlgSize.width()-200) / 2, (DlgSize.height() - 200) / 2., 200, 200);
+    BusySpinner->setGeometry( (DlgSize.width()-200) / 2, DlgSize.height() * 0.35 - (200 / 2.), 200, 200);
 
     QDialog::resizeEvent(event);
 }

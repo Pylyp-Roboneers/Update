@@ -43,27 +43,20 @@ struct ServerComunicationData
             + string(":") + SERVER_FOLER + "/LOGS";
         return Command;
     }
-    string BashCommandWithLog(const char* argument)
+    string BashCommandWithLog(const char* argument, bool withConsole = false)
     {
         string Command = "LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;";
-        Command += " konsole -e $SHELL -c \"$(pwd)/";
-        Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 7;\"";
-
-        // // Send log file to Server
-        // Command += "\n sleep 3; \n scp ";
-        // Command += LOCAL_SSHkeyToServer + SERVER_PORT;
-        // Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
-        // Command += SERVER_FOLER + "/LOGS/";
-
-        // // Send log file to Server and show console
-        // Command += "\n sleep 3; \n konsole -e $SHELL -c \" scp ";
-        // Command += LOCAL_SSHkeyToServer + SERVER_PORT;
-        // Command += " $LogFileName " + SERVER_USER + "@" + SERVER_ADRESS + ":";
-        // Command += SERVER_FOLER + "/LOGS/\"";
+        if(withConsole)
+        {
+            Command += " konsole -e $SHELL -c \"$(pwd)/";
+            Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 5;\"";
+        }
+        else
+        {
+            Command += " $SHELL -c \"$(pwd)/";
+            Command += BashFileName + " " + string(argument) + " | tee $LogFileName; sleep 5;\"";
+        }
         return Command;
-        // "LogFileName=$(pwd)/Log$(date +\"%y%m%d_%H%M\%S\").txt;"
-        // " konsole -e $SHELL -c \"$(pwd)/ToUpdateFromServer.sh --extract | tee $LogFileName; sleep 10\""
-        // " konsole -e $SHELL -c \" scp -i /home/deck/.ssh/keyToServer -P 2222 $LogFileName pi@77.222.152.213:theWD/LOGS/\""
     }
     void print()
     {
@@ -90,7 +83,7 @@ public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
     ServerComunicationData ServerData;
-    Spinner* Spnnr;
+    Spinner* BusySpinner;
     QTimer LaterTimer;
 
 private slots:
@@ -105,16 +98,16 @@ private slots:
 private:
     Ui::Dialog *ui;
 
-public:
-    static unsigned long long int getTimeNS()
-    {
-        return (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())).count();
-    }
-    static double getTimeSec()
-    {
-        static unsigned long long int time0 = getTimeNS();
-        return 1e-9 * double( getTimeNS() - time0);
-    }
+// public:
+//     static unsigned long long int getTimeNS()
+//     {
+//         return (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())).count();
+//     }
+//     static double getTimeSec()
+//     {
+//         static unsigned long long int time0 = getTimeNS();
+//         return 1e-9 * double( getTimeNS() - time0);
+//     }
 };
 namespace Ui {class Dialog2;}
 class Dialog2 : public QDialog
@@ -124,7 +117,7 @@ public:
     explicit Dialog2(QWidget *parent = nullptr);
     ~Dialog2();
     ServerComunicationData ServerData;
-    Spinner* Spnnr;
+    Spinner* BusySpinner;
 private:
     Ui::Dialog2 *ui;
 private slots:

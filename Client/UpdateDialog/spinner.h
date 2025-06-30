@@ -4,15 +4,15 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QMovie>
-using namespace std;
+
 class Spinner : public QWidget
 {
 Q_OBJECT
-QVBoxLayout *layout;
-QLabel *spinnerLabel;
-QMovie *movie;
+    QVBoxLayout *layout;
+    QLabel *spinnerLabel;
+    QMovie *movie;
 public:
-   Spinner(QWidget *parent) : QWidget(parent)
+   Spinner(QWidget *parent): QWidget(parent)
     {
         layout = new QVBoxLayout(parent);
         spinnerLabel = new QLabel(parent);
@@ -20,14 +20,12 @@ public:
         spinnerLabel->setMovie(movie);
         layout->addWidget(spinnerLabel, 0, Qt::AlignCenter);
         movie->stop();
-        spinnerLabel->move(0,0);
         setLayout(layout);
-        // spinnerLabel->setGeometry(0, 0, 200, 200);
 
         setAttribute(Qt::WA_StyledBackground);
         setStyleSheet("background-color: rgba( 255, 255, 255, 0% )");
-        hide();
         setWindowModality(Qt::ApplicationModal);
+        hide();
     }
     ~Spinner(){delete movie; delete spinnerLabel; delete layout;}
     void start() 

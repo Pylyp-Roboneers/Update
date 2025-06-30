@@ -72,7 +72,7 @@ int handleOfPostpone(int WaitTimeSec)  // WaitTimeSec: 1 day = 86400 sec
         fscanf(Fpost, "%lld", &T);
         fclose(Fpost);
 
-        unsigned long long int dT = (Dialog::getTimeNS() -T) / 1e9;
+        unsigned long long int dT = (getTimeNS() -T) / 1e9;
         
         FILE* LogF = fopen("waitForPostponedUpdate.txt", "w");
         fprintf(LogF, "Read time %lld ns\ntime since postpone %lld sec\nleft %lld sec", T, dT, WaitTimeSec - dT);
