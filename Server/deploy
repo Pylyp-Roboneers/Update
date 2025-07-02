@@ -22,24 +22,19 @@ sudo ssh-keygen -R $CLIENT_WGADDRESS
 cd /home/pi/.ssh/
 sudo ssh-keygen -f $keyFile -N ""
 if [ $? -ne 0 ]; 
-  then echo ssh key pair genaration is fault. Exit; exit 1  
+  then echo ssh key pair genaration is fault. Exit; exit 0
   else echo ssh key pair is genarated
 fi
 sudo chmod 600 $keyFile 
 sudo chmod 600 $keyFile.pub 
 sudo chown pi:pi $keyFile
 sudo chown pi:pi $keyFile.pub
-ls -l
 
-echo -e "\nINSTALL ssh key $keyFile on remote $CLIENT_USER@$CLIENT_WGADDRESS "
+echo -e "\n\nINSTALL ssh key $keyFile on remote $CLIENT_USER@$CLIENT_WGADDRESS"
 echo $CLIENT_PASSWORD | sshpass ssh-copy-id -o StrictHostKeyChecking=no -i /home/pi/.ssh/$keyFile $CLIENT_USER@$CLIENT_WGADDRESS
-# echo -e "$CLIENT_USER@$CLIENT_WGADDRESS"
-# sudo /home/pi/theWD/setSSHconnection.sh $CLIENT_USER@$CLIENT_WGADDRESS keyTo$CLIENT_WGADDRESS
 
 echo -e "\nAppend line to Client list"
-echo "$CLIENT_WGADDRESS update.7z NON_SHA $CLIENT_USER /home/deck/Downloads/UpDt/ keyTo$CLIENT_WGADDRESS" >> /home/pi/theWD/ClientList.txt
+echo "$CLIENT_WGADDRESS update.7z NON_SHA $CLIENT_USER /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo$CLIENT_WGADDRESS" >> /home/pi/theWD/ClientList.txt
 
 echo -e "\nssh -i /home/pi/.ssh/$keyFile $CLIENT_USER@$CLIENT_WGADDRESS"
-
-scp /home/pi/.ssh/$keyFile  $CLIENT_USER@$CLIENT_WGADDRESS:/etc/wireguard/
 exit 0

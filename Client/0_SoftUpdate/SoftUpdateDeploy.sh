@@ -1,12 +1,11 @@
 #!/bin/bash
 if [  -z "$1" ]; then echo -e "no wireguard adress specified as first argumet.\nExit" ; exit 1; fi
 CLIENT_WGADDRESS=$1
-if [  -z "$2" ]; then echo -e "no client user specified as first argumet.\nExit" ; exit 1; fi
+if [  -z "$2" ]; then echo -e "no client user specified as second argumet.\nExit" ; exit 1; fi
 CLIENT_USER=$2
-if [  -z "$3" ]; then echo -e "no client password specified as third argumet.\nExit" ; exit 1; fi
+if [  -z "$3" ]; then echo -e "no client user specified as third argumet.\nExit" ; exit 1; fi
 CLIENT_PASSWORD=$3
-
-echo UPDATE SOFTWARE DEPLOYMENT
+echo UPDATE SOFTWARE DEPLOYMENT  Vfrom20_
 # echo "11111111" | sudo -S -v  # if password to local is requered
 read inet CLIENT_ADRESS rest <<< $(ifconfig | grep "inet " | grep 192)
 echo ClientAddress=$CLIENT_ADRESS ClientWireguard=$CLIENT_WGADDRESS
@@ -79,6 +78,17 @@ if [ $? -ne 0 ]; then
     else echo "    There is net-tools"
 fi
 
+sshpass -V >  /dev/null 2>&1
+if [ $? -ne 0 ]; then 
+        echo -e "\n\n  THERE IS NO sshpass.\n  Installing  net-tools";
+        sudo pacman -S  sshpass
+        if [ $? -ne 0 ]; 
+            then echo -e "\n  Install of sshpass is fault.";
+            else echo -e "\n  sshpass is INSTALLED.";
+        fi
+    else echo "    There is sshpass"
+fi
+
 wg --version > /dev/null 2>&1
 if [ $? -ne 0 ]; then 
         echo -e "\n\n  THERE IS NO WireGuard.\n  Installing  WireGuard";
@@ -133,7 +143,6 @@ cat wg0.conf
 echo ====/etc/wireguard/includeToServer_wg0_conf.txt====
 cat includeToServer_wg0_conf.txt
 
-echo -e "Reload wireguard on steamdeck"
 sudo wg-quick up wg0
 sudo wg-quick down wg0
 sudo systemctl enable wg-quick@wg0.service
@@ -141,10 +150,21 @@ sudo systemctl enable wg-quick@wg0.service
 sudo systemctl start wg-quick@wg0
 sudo systemctl reload wg-quick@wg0
 
-echo -e "\n Copy includeToServer_wg0_conf to Server"
-scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
+echo -e "\n Copy includeToServer_wg0_conf to Server $CLIENT_PASSWORD"
+echo $CLIENT_PASSWORD | sshpass scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
+if [ $? -ne 0 ]; then # if wrong password to server CLIENT_PASSWORD
+    echo -e "    Wrong password to server"
+    scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
+fi
+# scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
+
 echo -e "\n Deploy wireguard and ssh $CLIENT_USER@$CLIENT_WGADDRESS connections from Server to stimdeck"
-ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
+echo $CLIENT_PASSWORD | sshpass ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
+if [ $? -ne 0 ]; then # if wrong password to server CLIENT_PASSWORD
+    echo -e "    Wrong password to server"
+    ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
+fi
+# ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
 
 echo End
 exit 0
