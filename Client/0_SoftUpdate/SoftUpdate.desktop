@@ -1,0 +1,17 @@
+[Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=/home/deck/Downloads/UpDt/SoftUpdate --update
+GenericName[en_US]=SoftUpdate
+GenericName=SoftUpdate
+Icon=system-run
+MimeType=
+Name[en_US]=SoftUpdate
+Name=SoftUpdate
+Path=/home/deck/Downloads/UpDt
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=

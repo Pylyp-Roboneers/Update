@@ -1,0 +1,21 @@
+#!/bin/bash
+CLIENT_WGADDRESS=$1
+CLIENT_USER=$2
+echo -e "Add peer to wg0.conf"
+cat /home/pi/Downloads/includeToServer_wg0_conf.txt >> /etc/wireguard/wg0.conf
+cat  /etc/wireguard/wg0.conf
+
+echo -e "RELOAD wireguard"
+sudo systemctl start wg-quick@wg0
+sudo systemctl reload wg-quick@wg0
+
+sleep 5
+ping $CLIENT_WGADDRESS -c10
+
+sudo ssh-keygen -R $CLIENT_WGADDRESS
+echo -e "\nCreate ssh key for connect of Server to client:$CLIENT_WGADDRESS"
+echo -e "$CLIENT_USER@$CLIENT_WGADDRESS"
+sudo /home/pi/theWD/setSSHconnection.sh $CLIENT_USER@$CLIENT_WGADDRESS keyTo$CLIENT_WGADDRESS
+
+echo -e "\nAppend line to Client list"
+echo "$CLIENT_WGADDRESS update.7z NON_SHA $CLIENT_USER /home/deck/Downloads/UpDt/ keyTo$CLIENT_WGADDRESS" >> /home/pi/theWD/ClientList.txt
