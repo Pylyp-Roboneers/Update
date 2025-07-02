@@ -3,8 +3,8 @@ if [  -z "$1" ]; then echo -e "no wireguard adress is specified as first argumet
 CLIENT_WGADDRESS=$1
 if [  -z "$2" ]; then echo -e "no client user is specified as second argumet.\nExit" ; exit 1; fi
 CLIENT_USER=$2
-# if [  -z "$3" ]; then echo -e "no client password is specified as third argumet.\nExit" ; exit 1; fi
-# CLIENT_PASSWORD=$3
+if [  -z "$3" ]; then echo -e "no client password is specified as third argumet.\nExit" ; exit 1; fi
+CLIENT_PASSWORD=$3
 
 CWD=$( dirname "$0")  # path to this script
 echo -e "COPY archive file with update software from Server"
@@ -22,4 +22,4 @@ if [ -d "$CWD/UpDt/" ];
     then echo -e "==$CWD/UpDt/ exists." 
     else echo -e "==$CWD/UpDt/ dose not exist. \nExit"; exit 1
 fi
-sudo $CWD/UpDt/0_SoftUpdate/SoftUpdateDeploy.sh $CLIENT_WGADDRESS $CLIENT_USER
+sudo $CWD/UpDt/0_SoftUpdate/SoftUpdateDeploy.sh $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD
