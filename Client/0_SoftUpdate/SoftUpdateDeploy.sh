@@ -40,6 +40,12 @@ sudo chmod 777 /home/deck/Desktop/SoftUpdate.desktop
 echo -e "\nCreating autostart of software update appication"
 autoRunSoft_Dir="/home/deck/.config/autostart"
 autoRunSoft_File="autorunSoftUpdate.sh.desktop"
+if [ -f "/home/deck/.config/autostart" ]; # delete file autostart if exists. The folder must by same name
+    then sudo mv /home/deck/.config/autostart /home/deck/.config/autostart_; echo rename autostart file; 
+fi
+if [ ! -d "/home/deck/.config/autostart" ]; # create folder autostart 
+    then mkdir /home/deck/.config/autostart/; sudo chmod -R 777  /home/deck/.config/autostart/;  echo create autostart folder; 
+fi
 if [ ! -f $autoRunSoft_Dir/$autoRunSoft_File ]; 
     then sudo cp $( dirname "$0")/$autoRunSoft_File $autoRunSoft_Dir
     else echo -e "    $autoRunSoft_Dir/$autoRunSoft_File already exists"
@@ -150,7 +156,7 @@ sudo systemctl enable wg-quick@wg0.service
 sudo systemctl start wg-quick@wg0
 sudo systemctl reload wg-quick@wg0
 
-echo -e "\n Copy includeToServer_wg0_conf to Server $CLIENT_PASSWORD"
+echo -e "\n Copy includeToServer_wg0_conf to Server"
 echo $CLIENT_PASSWORD | sshpass scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
 if [ $? -ne 0 ]; then # if wrong password to server CLIENT_PASSWORD
     echo -e "    Wrong password to server"

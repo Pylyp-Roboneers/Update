@@ -12,7 +12,7 @@ CLIENT_PASSWORD=$3
 sshpass -V >  /dev/null 2>&1
 if [ $? -ne 0 ]; then 
         echo -e "\n\n  THERE IS NO sshpass.\n  Installing  net-tools";
-        sudo pacman -S  sshpass
+        sudo pacman -S sshpass
         if [ $? -ne 0 ]; 
             then echo -e "\n  Install of sshpass is fault.";
             else echo -e "\n  sshpass is INSTALLED.";
