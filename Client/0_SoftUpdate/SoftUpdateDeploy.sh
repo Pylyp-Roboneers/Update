@@ -5,18 +5,31 @@ if [  -z "$2" ]; then echo -e "no client user specified as second argumet.\nExit
 CLIENT_USER=$2
 if [  -z "$3" ]; then echo -e "no client user specified as third argumet.\nExit" ; exit 1; fi
 CLIENT_PASSWORD=$3
+if [  -z "$4" ]; then echo -e "no server adress specified as forth argumet.\nExit" ; exit 1; fi
+UserAddresSERVER=$4
+if [  -z "$5" ]; then echo -e "no server password specified as fifth argumet.\nExit" ; exit 1; fi
+PASSWORDtoSERVER=$5
+UserAddresSERVERport=${UserAddresSERVER//"-P "/"-p "} # if there is port argument the with small -p 
+
 echo UPDATE SOFTWARE DEPLOYMENT  Vfrom20_
-# echo "11111111" | sudo -S -v  # if password to local is requered
+# echo "pasword" | sudo -S -v  # if password to local is requered
 read inet CLIENT_ADRESS rest <<< $(ifconfig | grep "inet " | grep 192)
 echo ClientAddress=$CLIENT_ADRESS ClientWireguard=$CLIENT_WGADDRESS
 
-SERVER_ADRESS=77.222.152.213
-SERVER_USER=pi
-SERVER_PORT=2222
+# SERVER_ADRESS=77.222.152.213
+# SERVER_USER=pi
+# SERVER_PORT=2222
+BeforeSERVERADRESS=" "${UserAddresSERVER%@*}
+SERVER_PORTwithP=${BeforeSERVERADRESS%" "*}
+SERVER_ADRESS=${UserAddresSERVER##*@} 
+SERVER_PORT=${SERVER_PORTwithP##*'-P '}
+SERVER_USER=${BeforeSERVERADRESS##*" "}
 if [ $SERVER_PORT ];
   then SERVER_PORT_arg=" -p $SERVER_PORT"; SERVER_PORT_Arg=" -P $SERVER_PORT";
   else SERVER_PORT_arg= ; SERVER_PORT_Arg= ;
 fi
+echo -e "\nSoft update deplay $UserAddresSERVER"
+echo -e "Detected $SERVER_USER@$SERVER_ADRESS port $SERVER_PORT;$SERVER_PORT_arg;$SERVER_PORT_Arg"
 
 ping 8.8.8.8 -c2 > /dev/null 2>&1
 if [ $? -eq 0 ]; 
@@ -106,6 +119,15 @@ if [ $? -ne 0 ]; then
     else echo "    There is WireGuard"
 fi
 
+# echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in wg0.conf)"
+# echo $PASSWORDtoSERVER | sshpass ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS \
+#     "sudo grep -rn '/etc/wireguard/wg0.conf' -e $CLIENT_WGADDRESS"
+# if [ $? -eq 0 ]; 
+#   # then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED. \nExit."; exit 0;
+#   then echo -e "\nTHE WIREGUARD ADRESS $CLIENT_WGADDRESS IS ALREADY USED in server wg0.conf.\nEXIT"; exit 0;
+#   else echo -e "    Wireguard adressed $CLIENT_WGADDRESS is new"
+# fi
+
 echo -e "\nESTABLISHING of Wiareguard Connection"
 sudo wg-quick down wg0
 sudo systemctl stop wg-quick@wg0
@@ -157,20 +179,19 @@ sudo systemctl start wg-quick@wg0
 sudo systemctl reload wg-quick@wg0
 
 echo -e "\n Copy includeToServer_wg0_conf to Server"
-echo $CLIENT_PASSWORD | sshpass scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
-if [ $? -ne 0 ]; then # if wrong password to server CLIENT_PASSWORD
+echo $PASSWORDtoSERVER | sshpass scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
+if [ $? -ne 0 ]; then # if wrong password to server PASSWORDtoSERVER
     echo -e "    Wrong password to server"
     scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
 fi
 # scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
 
 echo -e "\n Deploy wireguard and ssh $CLIENT_USER@$CLIENT_WGADDRESS connections from Server to stimdeck"
-echo $CLIENT_PASSWORD | sshpass ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
-if [ $? -ne 0 ]; then # if wrong password to server CLIENT_PASSWORD
+echo $PASSWORDtoSERVER | sshpass ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
+if [ $? -ne 0 ]; then # if wrong password to server PASSWORDtoSERVER
     echo -e "    Wrong password to server"
     ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
 fi
-# ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
 
 echo End
 exit 0

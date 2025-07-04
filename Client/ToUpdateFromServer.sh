@@ -112,7 +112,8 @@ if [[ "$#" -eq 0 ]] || [ "$1" == "--replace" ]; then
     done
     for aFile in ${!filePathList[@]}; do  # Check backup files existence
       if [ ! -f "$CWD/BackUp/$aFile" ]; then 
-        echo -e "    Backup of $aFile dose not exist. \nExit"; exit 1
+        # echo -e "    Backup of $aFile dose not exist. \nExit"; exit 1
+        echo -e "    Backup of $aFile dose not exist."
       fi
     done
     echo -e "==BackUp complited"

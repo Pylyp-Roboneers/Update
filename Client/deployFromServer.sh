@@ -1,6 +1,6 @@
 #!/bin/bash
 echo -e "Deploy softUpdate Vfrom20"
-PASSWORDtoSERVER=11111111
+# sudo ./deployFromServer.sh 10.168.103.76 deck 11111111 "-P 2222 pi@77.222.152.213" 11111111
 
 if [  -z "$1" ]; then echo -e "no wireguard adress is specified as first argumet.\nExit" ; exit 1; fi
 CLIENT_WGADDRESS=$1
@@ -8,6 +8,12 @@ if [  -z "$2" ]; then echo -e "no client user is specified as second argumet.\nE
 CLIENT_USER=$2
 if [  -z "$3" ]; then echo -e "no client password is specified as third argumet.\nExit" ; exit 1; fi
 CLIENT_PASSWORD=$3
+if [  -z "$4" ]; then echo -e "no server user@adress is specified as forth argumet.\nExit" ; exit 1; fi
+UserAddresSERVER=$4
+if [  -z "$5" ]; then echo -e "no server password is specified as fifth argumet.\nExit" ; exit 1; fi
+PASSWORDtoSERVER=$5
+UserAddresSERVERport=${UserAddresSERVER//"-P "/"-p "} # if there is port argument the with small -p 
+echo Server $UserAddresSERVERport $UserAddresSERVER
 
 sshpass -V >  /dev/null 2>&1
 if [ $? -ne 0 ]; then 
@@ -20,12 +26,25 @@ if [ $? -ne 0 ]; then
     else echo "    There is sshpass"
 fi
 
+echo -e "Check passwort to server $UserAddresSERVERport"
+res=$(echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport "echo 1")
+if [ $res -eq 1 ]; then echo "    password valid"; else echo -e "SERVER PASSWORD is NOT VALID.\nEXIT"; exit 0; fi
+
+echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in $UserAddresSERVERport:wg0.conf)"
+echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport \
+    "sudo grep -rn '/etc/wireguard/wg0.conf' -e $CLIENT_WGADDRESS"
+if [ $? -eq 0 ]; 
+  # then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED. \nExit."; exit 0;
+  then echo -e "\nTHE WIREGUARD ADRESS $CLIENT_WGADDRESS IS ALREADY USED in server wg0.conf.\nEXIT"; exit 0;
+  else echo -e "    Wireguard adressed $CLIENT_WGADDRESS is new"
+fi
+
 CWD=$( dirname "$0")  # path to this script
 echo -e "COPY archive file with update software from Server"
-echo $PASSWORDtoSERVER | sshpass scp -P 2222 pi@77.222.152.213:/home/pi/theWD/SoftUpDt.7z $CWD/
+echo $PASSWORDtoSERVER | sshpass scp -o StrictHostKeyChecking=no $UserAddresSERVER:/home/pi/theWD/SoftUpDt.7z $CWD/
 if [ $? -ne 0 ]; then # if wrong password to server PASSWORDtoSERVER
     echo -e "    Wrong password to server"
-    scp -P 2222 pi@77.222.152.213:/home/pi/theWD/SoftUpDt.7z $CWD/
+    scp $UserAddresSERVER:/home/pi/theWD/SoftUpDt.7z $CWD/
 fi
 
 echo -e "EXTRACT update software"
@@ -40,4 +59,4 @@ if [ -d "$CWD/UpDt/" ];
     then echo -e "==$CWD/UpDt/ exists." 
     else echo -e "==$CWD/UpDt/ dose not exist. \nExit"; exit 1
 fi
-sudo $CWD/UpDt/0_SoftUpdate/SoftUpdateDeploy.sh $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD
+sudo $CWD/UpDt/0_SoftUpdate/SoftUpdateDeploy.sh $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD "$UserAddresSERVER" $PASSWORDtoSERVER
