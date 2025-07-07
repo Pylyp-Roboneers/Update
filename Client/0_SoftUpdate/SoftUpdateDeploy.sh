@@ -28,7 +28,7 @@ if [ $SERVER_PORT ];
   then SERVER_PORT_arg=" -p $SERVER_PORT"; SERVER_PORT_Arg=" -P $SERVER_PORT";
   else SERVER_PORT_arg= ; SERVER_PORT_Arg= ;
 fi
-echo -e "\nSoft update deplay $UserAddresSERVER"
+echo -e "\nSoft update deplay $UserAddresSERVER LNXcmp"
 echo -e "Detected $SERVER_USER@$SERVER_ADRESS port $SERVER_PORT;$SERVER_PORT_arg;$SERVER_PORT_Arg"
 
 ping 8.8.8.8 -c2 > /dev/null 2>&1

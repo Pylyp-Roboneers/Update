@@ -2,12 +2,12 @@
 CLIENT_WGADDRESS=$1
 CLIENT_USER=$2
 CLIENT_PASSWORD=$3
-# CLIENT_PASSWORD="11111111"
 
 echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in wg0.conf)"
 sudo grep -rn '/etc/wireguard/wg0.conf' -e "$CLIENT_WGADDRESS"
 if [ $? -eq 0 ]; 
-  then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED. \nExit."; exit 0;
+  # then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED. \nExit."; exit 0;
+  then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED.";
   else echo "    Wireguard adressed $CLIENT_WGADDRESS is new"
 fi
 
@@ -28,6 +28,8 @@ keyFile=keyTo$CLIENT_WGADDRESS
 sudo ssh-keygen -R $CLIENT_WGADDRESS
 # Generate ssh key pair
 cd /home/pi/.ssh/
+if [ -f "$keyFile" ]; then sudo rm -f $keyFile; fi
+if [ -f "$keyFile.pub" ]; then sudo rm -f $keyFile.pub; fi
 sudo ssh-keygen -f $keyFile -N ""
 if [ $? -ne 0 ]; 
   then echo ssh key pair genaration is fault. Exit; exit 1

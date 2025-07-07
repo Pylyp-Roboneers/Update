@@ -12,9 +12,23 @@ if [  -z "$4" ]; then echo -e "no server user@adress is specified as forth argum
 UserAddresSERVER=$4
 if [  -z "$5" ]; then echo -e "no server password is specified as fifth argumet.\nExit" ; exit 1; fi
 PASSWORDtoSERVER=$5
-UserAddresSERVERport=${UserAddresSERVER//"-P "/"-p "} # if there is port argument the with small -p 
-echo Server $UserAddresSERVERport $UserAddresSERVER
+UserAddresSERVERport=${UserAddresSERVER//"-P "/"-p "} # if there is port argument then argument for ssh with small -p 
+SERVER_ADRESS=${UserAddresSERVER##*@}  # extract server IP address from forth argument
+echo Server :$SERVER_ADRESS, $UserAddresSERVERport, $UserAddresSERVER.
 
+# Check Internet connection
+ping 8.8.8.8 -c2 > /dev/null 2>&1
+if [ $? -eq 0 ]; 
+    then echo -e "    There is Internet"
+    else echo -e "    There is NO Internet"; exit 1
+fi
+# Check connection to Server
+ping $SERVER_ADRESS -c2 > /dev/null 2>&1
+if [ $? -eq 0 ]; 
+    then echo -e "    Server is connected"
+    else echo -e "    Server is NOT connected"; exit 1
+fi
+# Check program sshpass for automatic password imployment
 sshpass -V >  /dev/null 2>&1
 if [ $? -ne 0 ]; then 
         echo -e "\n\n  THERE IS NO sshpass.\n  Installing  net-tools";
@@ -25,7 +39,7 @@ if [ $? -ne 0 ]; then
         fi
     else echo "    There is sshpass"
 fi
-
+# Check server password validity
 echo -e "Check passwort to server $UserAddresSERVERport"
 res=$(echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport "echo 1")
 if [ $res -eq 1 ]; then echo "    password valid"; else echo -e "SERVER PASSWORD is NOT VALID.\nEXIT"; exit 0; fi
@@ -34,7 +48,6 @@ echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in $U
 echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport \
     "sudo grep -rn '/etc/wireguard/wg0.conf' -e $CLIENT_WGADDRESS"
 if [ $? -eq 0 ]; 
-  # then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED. \nExit."; exit 0;
   then echo -e "\nTHE WIREGUARD ADRESS $CLIENT_WGADDRESS IS ALREADY USED in server wg0.conf.\nEXIT"; exit 0;
   else echo -e "    Wireguard adressed $CLIENT_WGADDRESS is new"
 fi
