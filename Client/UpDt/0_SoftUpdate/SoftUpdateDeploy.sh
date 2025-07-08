@@ -10,9 +10,10 @@ UserAddresSERVER=$4
 if [  -z "$5" ]; then echo -e "no server password specified as fifth argumet.\nExit" ; exit 1; fi
 PASSWORDtoSERVER=$5
 UserAddresSERVERport=${UserAddresSERVER//"-P "/"-p "} # if there is port argument the with small -p 
-
-echo UPDATE SOFTWARE DEPLOYMENT  Vfrom20_
 # echo "pasword" | sudo -S -v  # if password to local is requered
+
+echo UPDATE SOFTWARE DEPLOYMENT  V_II
+# Read current IP adress
 read inet CLIENT_ADRESS rest <<< $(ifconfig | grep "inet " | grep 192)
 echo ClientAddress=$CLIENT_ADRESS ClientWireguard=$CLIENT_WGADDRESS
 
@@ -68,11 +69,6 @@ sudo chmod 777 $autoRunSoft_Dir/$autoRunSoft_File
 echo -e "\nSet sudo without password" 
 sudo echo -e "%wheel ALL=(ALL:ALL) ALL\n%wheel ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/wheel
 sudo echo -e "%sudo ALL=(ALL) ALL\nroot ALL=(ALL:ALL) ALL\n%admin ALL=(ALL) NOPASSWD:ALL\n%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo
-
-# echo -e =====cat /etc/sudoers.d/sudo
-# sudo cat /etc/sudoers.d/sudo
-# echo -e =====cat /etc/sudoers.d/wheel
-# sudo cat /etc/sudoers.d/wheel
 
 echo -e "\nCheck necessary software" 
 resolvconf --version > /dev/null 2>&1
@@ -157,6 +153,8 @@ Endpoint = 77.222.152.213:51520
 AllowedIPs = 10.168.103.0/24
 PersistentKeepalive = 25
 " > wg0.conf
+echo ====/etc/wireguard/wg0.conf====
+cat wg0.conf
 
 echo -e "### begin steamdeck via auto deploy $(date) ###
 [Peer]
@@ -165,16 +163,13 @@ PresharedKey = xLqx1ng4N+iRXl7GFkuFe18oZ368LnZthbcKbtN3vOA=
 AllowedIPs = $CLIENT_WGADDRESS/32
 ### end steamdeck ###
 " > includeToServer_wg0_conf.txt
-
-echo ====/etc/wireguard/wg0.conf====
-cat wg0.conf
 echo ====/etc/wireguard/includeToServer_wg0_conf.txt====
 cat includeToServer_wg0_conf.txt
 
+echo -e "\n Reload of client wireguard"
 sudo wg-quick up wg0
 sudo wg-quick down wg0
 sudo systemctl enable wg-quick@wg0.service
-
 sudo systemctl start wg-quick@wg0
 sudo systemctl reload wg-quick@wg0
 
@@ -186,7 +181,7 @@ if [ $? -ne 0 ]; then # if wrong password to server PASSWORDtoSERVER
 fi
 # scp $SERVER_PORT_Arg /etc/wireguard/includeToServer_wg0_conf.txt $SERVER_USER@$SERVER_ADRESS:/home/pi/Downloads/
 
-echo -e "\n Deploy wireguard and ssh $CLIENT_USER@$CLIENT_WGADDRESS connections from Server to stimdeck"
+echo -e "\n Deploy wireguard and ssh $CLIENT_USER@$CLIENT_WGADDRESS connections from Server to steamdeck"
 echo $PASSWORDtoSERVER | sshpass ssh $SERVER_PORT_arg $SERVER_USER@$SERVER_ADRESS "sudo /home/pi/deploy $CLIENT_WGADDRESS $CLIENT_USER $CLIENT_PASSWORD"
 if [ $? -ne 0 ]; then # if wrong password to server PASSWORDtoSERVER
     echo -e "    Wrong password to server"
