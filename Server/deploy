@@ -1,0 +1,59 @@
+#!/bin/bash
+CLIENT_WGADDRESS=$1
+CLIENT_USER=$2
+CLIENT_PASSWORD=$3
+# Add in /etc/sudoers following lines to avoid password promt
+# pi ALL=(ALL) NOPASSWD: /home/pi/deploy
+# ALL ALL=(ALL) NOPASSWD: /usr/bin/ssh-copy-id
+
+#sudo ./deploy 10.168.103.7 deck "password"
+
+echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in wg0.conf)"
+sudo grep -rn '/etc/wireguard/wg0.conf' -e "$CLIENT_WGADDRESS"
+if [ $? -eq 0 ]; 
+  # then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED. \nExit."; exit 0;
+  then echo -e "\nTHE wireguard adressed $CLIENT_WGADDRESS IS ALREADY USED.";
+  else echo "    Wireguard adressed $CLIENT_WGADDRESS is new"
+fi
+
+echo -e "Add peer to server wg0.conf"
+cat /home/pi/Downloads/includeToServer_wg0_conf.txt >> /etc/wireguard/wg0.conf
+# cat  /etc/wireguard/wg0.conf
+
+echo -e "RELOAD server wireguard"
+sudo systemctl start wg-quick@wg0
+sudo systemctl reload wg-quick@wg0
+echo -e "    Wait 15 seconds for client VPN ping $CLIENT_WGADDRESS"
+sleep 5
+ping $CLIENT_WGADDRESS -c10
+if [ $? -ne 0 ]; then echo -e "\n    Wireguard adressed $CLIENT_WGADDRESS is not ping. \nExit."; exit 0; fi
+
+echo -e "Create ssh key for connect of Server to client:$CLIENT_WGADDRESS"
+keyFile=keyTo$CLIENT_WGADDRESS
+echo "ssh-keygen -R"
+sudo ssh-keygen -R $CLIENT_WGADDRESS
+# Generate ssh key pair
+cd /home/pi/.ssh/
+if [ -f "$keyFile" ]; then sudo rm -f $keyFile; fi
+if [ -f "$keyFile.pub" ]; then sudo rm -f $keyFile.pub; fi
+sudo ssh-keygen -f $keyFile -N ""
+if [ $? -ne 0 ]; 
+  then echo ssh key pair genaration is fault. Exit; exit 0
+  else echo ssh key pair is genarated
+fi
+sudo chmod 600 $keyFile 
+sudo chmod 600 $keyFile.pub 
+sudo chown pi:pi $keyFile
+sudo chown pi:pi $keyFile.pub
+echo -e "    Key name:$keyFile"
+
+echo -e "\n\nINSTALL ssh key $keyFile on remote $CLIENT_USER@$CLIENT_WGADDRESS"
+echo $CLIENT_PASSWORD | sshpass ssh-copy-id -o StrictHostKeyChecking=no -i /home/pi/.ssh/$keyFile $CLIENT_USER@$CLIENT_WGADDRESS
+
+echo -e "\nAppend line to Client list"
+sudo grep -rn '/home/pi/theWD/ClientList.txt' -e "$CLIENT_WGADDRESS"
+if [ $? -eq 0 ]; then echo -e "    WARNING: wireguard adressed $CLIENT_WGADDRESS is already in Client List"; fi
+echo "$CLIENT_WGADDRESS update.7z NON_SHA $CLIENT_USER /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo$CLIENT_WGADDRESS" >> /home/pi/theWD/ClientList.txt
+
+echo -e "\nssh -i /home/pi/.ssh/$keyFile $CLIENT_USER@$CLIENT_WGADDRESS"
+exit 0

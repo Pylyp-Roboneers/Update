@@ -1,17 +1,20 @@
 #!/bin/bash
-echo -e "Deploy softUpdate Vfrom20"
+echo -e "Deploy softUpdate Vfrom102III"
 # sudo ./deployFromServer.sh 10.168.103.76 deck 11111111 "-P 2222 pi@77.222.152.213" 11111111
+# if server port is specified then the argument MUST be with capital " -P "
 
-if [  -z "$1" ]; then echo -e "no wireguard adress is specified as first argumet.\nExit" ; exit 1; fi
+if [  -z "$1" ]; then echo -e "no wireguard adress is specified as first argument.\nExit" ; exit 1; fi
 CLIENT_WGADDRESS=$1
-if [  -z "$2" ]; then echo -e "no client user is specified as second argumet.\nExit" ; exit 1; fi
+if [  -z "$2" ]; then echo -e "no client user is specified as second argument.\nExit" ; exit 1; fi
 CLIENT_USER=$2
-if [  -z "$3" ]; then echo -e "no client password is specified as third argumet.\nExit" ; exit 1; fi
+if [  -z "$3" ]; then echo -e "no client password is specified as third argument.\nExit" ; exit 1; fi
 CLIENT_PASSWORD=$3
-if [  -z "$4" ]; then echo -e "no server user@adress is specified as forth argumet.\nExit" ; exit 1; fi
+if [  -z "$4" ]; then echo -e "no server user@adress is specified as forth argument.\nExit" ; exit 1; fi
 UserAddresSERVER=$4
-if [  -z "$5" ]; then echo -e "no server password is specified as fifth argumet.\nExit" ; exit 1; fi
+if [  -z "$5" ]; then echo -e "no server password is specified as fifth argument.\nExit" ; exit 1; fi
 PASSWORDtoSERVER=$5
+
+# parsing of UserAddresSERVER (forth) argument to separate IP adress, user name, and port
 UserAddresSERVERport=${UserAddresSERVER//"-P "/"-p "} # if there is port argument then argument for ssh with small -p 
 SERVER_ADRESS=${UserAddresSERVER##*@}  # extract server IP address from forth argument
 echo Server :$SERVER_ADRESS, $UserAddresSERVERport, $UserAddresSERVER.
@@ -28,21 +31,59 @@ if [ $? -eq 0 ];
     then echo -e "    Server is connected"
     else echo -e "    Server is NOT connected"; exit 1
 fi
-# Check program sshpass for automatic password imployment
+
+echo -e "\nSet sudo without password" 
+sudo echo -e "%wheel ALL=(ALL:ALL) ALL\n%wheel ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/wheel
+sudo echo -e "%sudo ALL=(ALL) ALL\nroot ALL=(ALL:ALL) ALL\n%admin ALL=(ALL) NOPASSWD:ALL\n%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo
+
+echo -e "\nCheck necessary software" 
+ifconfig > /dev/null 2>&1
+if [ $? -ne 0 ]; then 
+        echo -e "\n\n  THERE IS NO net-tools.\n  Installing  net-tools";
+        sudo pacman -S  net-tools
+        if [ $? -ne 0 ]; 
+            then echo -e "\n  Install of net-tools is fault.";
+            else echo -e "\n  net-tools is INSTALLED.";
+        fi
+    else echo "    There is net-tools"
+fi
 sshpass -V >  /dev/null 2>&1
 if [ $? -ne 0 ]; then 
         echo -e "\n\n  THERE IS NO sshpass.\n  Installing  net-tools";
-        sudo pacman -S sshpass
+        sudo pacman -S  sshpass
         if [ $? -ne 0 ]; 
             then echo -e "\n  Install of sshpass is fault.";
             else echo -e "\n  sshpass is INSTALLED.";
         fi
     else echo "    There is sshpass"
 fi
+wg --version > /dev/null 2>&1
+if [ $? -ne 0 ]; then 
+        echo -e "\n\n  THERE IS NO WireGuard.\n  Installing  WireGuard";
+        sudo pacman -S  wg
+        if [ $? -ne 0 ]; 
+            then echo -e "\n  Install of WireGuard is fault.";
+            else echo -e "\n  WireGuard is INSTALLED.";
+        fi
+    else echo "    There is WireGuard"
+fi
+resolvconf --version > /dev/null 2>&1
+if [ $? -ne 0 ]; then 
+        echo -e "\n\n  THERE IS NO resolvconf.\n  Installing resolvconf";
+        sudo pacman -S resolvconf
+        resolvconf --version
+        if [ $? -ne 0 ]; 
+            then echo -e "\n  Install of resolvconf is fault.";
+            else echo -e "\n  resolvconf is INSTALLED.";
+        fi
+        sudo reboot
+    else echo "    There is resolvconf"
+fi
+
 # Check server password validity
 echo -e "Check passwort to server $UserAddresSERVERport"
 res=$(echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport "echo 1")
-if [ $res -eq 1 ]; then echo "    password valid"; else echo -e "SERVER PASSWORD is NOT VALID.\nEXIT"; exit 0; fi
+if [ $res='1' ]; then echo "    password valid"; else echo -e "SERVER PASSWORD is NOT VALID.\nEXIT"; exit 0; fi
 
 echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in $UserAddresSERVERport:wg0.conf)"
 echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport \
