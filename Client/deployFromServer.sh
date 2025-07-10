@@ -1,5 +1,6 @@
 #!/bin/bash
-echo -e "Deploy softUpdate Vfrom102III"
+FullPathDIR=$( cd $(dirname "$0") && pwd -P)
+echo -e "Deploy softUpdate Vfrom102III in $FullPathDIR"
 # sudo ./deployFromServer.sh 10.168.103.76 deck 11111111 "-P 2222 pi@77.222.152.213" 11111111
 # if server port is specified then the argument MUST be with capital " -P "
 
@@ -82,8 +83,9 @@ fi
 
 # Check server password validity
 echo -e "Check passwort to server $UserAddresSERVERport"
-res=$(echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport "echo 1")
-if [ $res='1' ]; then echo "    password valid"; else echo -e "SERVER PASSWORD is NOT VALID.\nEXIT"; exit 0; fi
+res=$(echo $PASSWORDtoSERVER | sshpass ssh -o StrictHostKeyChecking=no $UserAddresSERVERport "echo '12'")
+echo -e "    test result: $res = 12"
+if [ "$res" = "12" ]; then echo "    password valid"; else echo -e "SERVER PASSWORD is NOT VALID.\nEXIT"; exit 0; fi
 
 echo -e "Check whether wireguard addresses $CLIENT_WGADDRESS is used (find in $UserAddresSERVERport:wg0.conf)"
 echo $PASSWORDtoSERVER | sshpass ssh $UserAddresSERVERport \

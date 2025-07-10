@@ -2,6 +2,7 @@
 CLIENT_WGADDRESS=$1
 CLIENT_USER=$2
 CLIENT_PASSWORD=$3
+CLIENT_FOLDER="/home/deck/Downloads/UpDt/"
 # Add in /etc/sudoers following lines to avoid password promt
 # pi ALL=(ALL) NOPASSWD: /home/pi/deploy
 # ALL ALL=(ALL) NOPASSWD: /usr/bin/ssh-copy-id
@@ -53,7 +54,7 @@ echo $CLIENT_PASSWORD | sshpass ssh-copy-id -o StrictHostKeyChecking=no -i /home
 echo -e "\nAppend line to Client list"
 sudo grep -rn '/home/pi/theWD/ClientList.txt' -e "$CLIENT_WGADDRESS"
 if [ $? -eq 0 ]; then echo -e "    WARNING: wireguard adressed $CLIENT_WGADDRESS is already in Client List"; fi
-echo "$CLIENT_WGADDRESS update.7z NON_SHA $CLIENT_USER /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo$CLIENT_WGADDRESS" >> /home/pi/theWD/ClientList.txt
+echo "$CLIENT_WGADDRESS update.7z NON_SHA $CLIENT_USER $CLIENT_FOLDER /home/pi/.ssh/keyTo$CLIENT_WGADDRESS" >> /home/pi/theWD/ClientList.txt
 
 echo -e "\nssh -i /home/pi/.ssh/$keyFile $CLIENT_USER@$CLIENT_WGADDRESS"
 exit 0

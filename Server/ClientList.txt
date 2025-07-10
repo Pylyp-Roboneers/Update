@@ -2,7 +2,5 @@
 10.168.103.9 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 admin /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
 10.168.103.11 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 admin /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyToClnt05
 10.168.103.5 update.7z acacfec03a384deff69ec49713731b5c6281e5b2 deck /home/deck/Downloads/usr/UpDt/ /home/pi/.ssh/keyToClnt05
-10.168.103.99 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo10.168.103.99
-10.168.103.98 update.7z NON_SHA deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo10.168.103.98
-10.168.103.91 update.7z NON_SHA deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo10.168.103.91
-10.168.103.31 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo10.168.103.31
+10.168.103.41 update.7z acacfec03a384deff69ec49713731b5c6281e5b2 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo10.168.103.41
+10.168.103.42 update.7z 9aaee7d638c747b70124c88ee2d738b938c840c6 deck /home/deck/Downloads/UpDt/ /home/pi/.ssh/keyTo10.168.103.42
