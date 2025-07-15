@@ -16,24 +16,26 @@ for lineN in ${!IPlist[@]}; do
 
   # get client connection parrameters from line
   read Adress ArchiveFile SHAarchive User Path SSHkeyToClient <<< ${IPlist[$lineN]}
-  echo "Adress=$Adress; File=$ArchiveFile; Sha=$SHAarchive; User=$User; path=$Path key=$SSHkeyToClient"
+  # echo "Adress=$Adress; File=$ArchiveFile; Sha=$SHAarchive; User=$User; path=$Path key=$SSHkeyToClient"
+  echo -e -n "\n$User@$Adress:$ArchiveFile"
 
   # current archive file SHA on Server
   shaArchive=$(sha1sum $CWD/$ArchiveFile  | cut -d " " -f 1)
   # if current SHA differs from SHA from list then run update 
-  if [[ $shaArchive != $SHAarchive ]]; then 
+  if [[ $shaArchive == $SHAarchive ]]; then echo -e -n " NOT UpToDate"; continue; fi
 
-    # Replace archive file on Client
-    $CWD/UpdateClient.sh $Adress $User $ArchiveFile $Path $SSHkeyToClient >> logsItr.txt
-    if [ $? -ne 0 ]; then continue; fi
+  # Replace archive file on Client
+  $CWD/UpdateClient.sh $Adress $User $ArchiveFile $Path $SSHkeyToClient >> logsItr.txt
+  if [[ $? -ne 0 ]]; then  echo -e -n " NOT transfered"; continue; fi
+  echo -e -n " Copied"
 
-    # Reading of SHA of copied archive file on Client to proove file copy
-    if [ $SSHkeyToClient ]; then sshKey=" -i $SSHkeyToClient"; else sshKey=""; fi  # add option -i to ssh key, if no key then no option
-    ClientArchiveSHA=$(ssh $sshKey $User@$Adress "sha1sum $Path$ArchiveFile  | cut -d ' ' -f 1")
-    if [[ ! $ClientArchiveSHA ]]; then ClientArchiveSHA="NONE_SHA__$ClientArchiveSHA"; fi  # if recieved empty SHA
+  # Reading of SHA of copied archive file on Client to proove file copy
+  if [ $SSHkeyToClient ]; then sshKey=" -i $SSHkeyToClient"; else sshKey=""; fi  # add option -i to ssh key, if no key then no option
+  ClientArchiveSHA=$(ssh $sshKey $User@$Adress "sha1sum $Path$ArchiveFile  | cut -d ' ' -f 1")
+  if [[ ! $ClientArchiveSHA ]]; then ClientArchiveSHA="NONE_SHA__$ClientArchiveSHA"; fi  # if recieved empty SHA
 
-    # Exchange list line by new SHA for current IP
-    sed -i "s/$Adress $ArchiveFile $SHAarchive/$Adress $ArchiveFile $ClientArchiveSHA/" $CWD/ClientList.txt 
-  fi  # if [[ $shaArchive != $SHAarchive ]]
+  # Exchange list line by new SHA for current IP
+  sed -i "s/$Adress $ArchiveFile $SHAarchive/$Adress $ArchiveFile $ClientArchiveSHA/" $CWD/ClientList.txt 
 done # for lineN in ${!IPlist[@]}
+echo -e "\nIteration END\n\n\n\n" >> logsItr.txt
 exit 0

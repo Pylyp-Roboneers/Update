@@ -122,6 +122,8 @@ Dialog2::Dialog2(QWidget *parent): QDialog(parent), ui(new Ui::Dialog2)
 }
 Dialog2::~Dialog2()
 {
+
+    ui->pushButton_3->hide();
     delete ui;
 }
 
@@ -208,11 +210,15 @@ void Dialog2::resizeEvent(QResizeEvent *event)
     ui->pushButton_3->setGeometry(indent * Sx, DlgSize.height() - (indent + 100) * Sy
         , (ResX - 3 * indent) * Sx /2, 100 * Sy);
     ui->pushButton_3->setFont(font);
+    ui->pushButton_3->hide();
 
     // Cancel button
-    ui->pushButton_4->setGeometry((ResX + indent) * Sx / 2, DlgSize.height() -  (indent + 100) * Sy
-        , (ResX - 3 * indent) * Sx /2, 100 * Sy);
+    ui->pushButton_4->setGeometry((ResX - 750) * Sx /2, DlgSize.height() - (indent + 100) * Sy
+        , 750 * Sx, 100 * Sy);
     ui->pushButton_4->setFont(font);
+    // ui->pushButton_4->setGeometry((ResX + indent) * Sx / 2, DlgSize.height() - (indent + 100) * Sy
+    //     , (ResX - 3 * indent) * Sx /2, 100 * Sy);
+    // ui->pushButton_4->setFont(font);
 
     ui->companyLogo->setGeometry(32 * Sx, 32 * Sy, 32 * Sx, 32 * Sy);
     ui->companyName->setGeometry(72 * Sx, 38 * Sy, 182 * Sx, 20 * Sy);

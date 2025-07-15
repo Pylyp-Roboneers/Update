@@ -21,28 +21,28 @@ if [ $CLIENT_PORT ];
   else CLIENT_port= ; CLIENT_Port= ;
 fi
 
-echo -e "\n\nUPDATING CLIENT============================================$CLIENT_USER@$CLIENT_ADRESS"
+echo -e "\nUPDATING CLIENT $CLIENT_USER@$CLIENT_ADRESS"
 
-echo  -e "___CHECK archive file existence on Server."
+# echo  -e "___CHECK archive file existence on Server."
 if [ -f $CWD/$SERVER_ArchiveFile ]; 
-  then echo -e "==Achive file $CWD/$SERVER_ArchiveFile exists."
+  then echo -e -n "==Achive file $CWD/$SERVER_ArchiveFile exists."
   else echo -e "==Achive file $CWD/$SERVER_ArchiveFile does NOT exist.\nExit"; exit 1
 fi
 
-echo  -e "___CHECK connection to Client by ping"
-ping $CLIENT_ADRESS -c2
+# echo  -e "___CHECK connection to Client by ping"
+ping $CLIENT_ADRESS -c2 > /dev/null 2>&1
 if [ $? -eq 0 ];
   then echo -e "==Client $CLIENT_ADRESS is connected"
   else echo -e "==No ping of Client $CLIENT_ADRESS.\nExit"; exit 1
 fi
 
-echo -e "___COMPARE archives on Sever and Client by SHA"
+# echo -e "___COMPARE archives on Sever and Client by SHA"
 shaFile1=$($SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "sha1sum $CLIENT_FOLER$SERVER_ArchiveFile | cut -d ' ' -f 1")
 shaFile2=$(sha1sum $CWD/$SERVER_ArchiveFile | cut -d " " -f 1)
 echo Client arhive sha:$shaFile1
 echo Server arhive sha:$shaFile2
 
-echo -e "___COPY of update file from Server"
+echo -e "COPY of update file from Server"
 if [[ $shaFile1 != $shaFile2 ]]; then  
   echo  -e "  >>>>>> WAIT few minutes for copy archive to Client"
   scp -o StrictHostKeyChecking=no $SSHkeyToClient $CLIENT_Port $CWD/$SERVER_ArchiveFile $CLIENT_USER@$CLIENT_ADRESS:$CLIENT_FOLER
@@ -59,7 +59,7 @@ fi
 CLIENT_CPU=$($SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "sudo dmidecode -t system | grep Serial")
 echo -n -e "\n$(date +%y.%m.%d-%H:%M:%S) $CLIENT_USER@$CLIENT_ADRESS $shaFile1 $SSHkeyToClient $CLIENT_Port $CLIENT_FOLER$SERVER_ArchiveFile $CLIENT_CPU Copied" >> Log.txt
 
-echo -e "___EXTRACT archive file on Client"
+echo -e "EXTRACT archive file on Client"
 $SSH $SSHkeyToClient $CLIENT_port $CLIENT_USER@$CLIENT_ADRESS "sudo 7z x -y $CLIENT_FOLER$SERVER_ArchiveFile -o\"$CLIENT_FOLER\"; sudo chmod -R 777 $CLIENT_FOLER/UpDate;"
 # print logs of extruction result to file Log.txt
 if [ $? -eq 0 ]; 

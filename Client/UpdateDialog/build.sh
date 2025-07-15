@@ -14,7 +14,8 @@ make
 echo copy to /home/pylypvolodin/WorkDir/SoftUpdate/UpDt
 sudo cp $WrckDir/build/SoftUpdate /home/pylypvolodin/WorkDir/SoftUpdate/UpDt
 echo copy to $steamIP
-sudo scp $WrckDir/build/SoftUpdate $steamIP:/home/deck/Downloads/UpDt/
+echo "11111111" | scp $WrckDir/build/SoftUpdate $steamIP:/home/deck/Downloads/UpDt/
+# sudo scp $WrckDir/build/SoftUpdate $steamIP:/home/deck/Downloads/UpDt/
 # cd $WrckDir
 # cd ..
 sudo chmod -R 777 /home/pylypvolodin/WorkDir/
